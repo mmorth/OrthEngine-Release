@@ -33,7 +33,7 @@ Note that a Docker container will eventually be created for OrthEngine to better
 
 ## Resources
 Below is the sample scene that is rendering when first running OrthEngine:
-![OrthEngine](https://github.com/mmorth/OrthEngine-Release/blob/master/Resources/OrthEngine.png)
+![OrthEngine](https://github.com/mmorth/OrthEngine-Release/blob/master/Resouorces/OrthEngine.png)
 
 ## Contributors
 - Matthew Orth
