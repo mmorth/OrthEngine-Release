@@ -1,0 +1,17 @@
+{
+  "drawNormals": true,
+  "framebufferEnabled": false,
+  "msaaEnabled": false,
+  "displayFps": true,
+  "depthState": true,
+  "blendState": true,
+  "wireframeState": false,
+  "windowWidth": 1200,
+  "windowHeight": 800,
+  "windowName": "OrthEngine",
+  "limitFps": true,
+  "majorVersion": 3,
+  "minorVersion": 3,
+  "numSamples": 4,
+  "testingError": false
+}
