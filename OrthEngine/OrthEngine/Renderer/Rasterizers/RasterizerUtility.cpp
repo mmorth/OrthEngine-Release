@@ -13,7 +13,7 @@ void RasterizerUtility::setDepthTestState(const bool isEnabled)
         glDisable(GL_DEPTH_TEST);
     }
 
-    //LOG(INFO) << "Depth test set to " << isEnabled;
+    LOG(INFO) << "Depth test set to " << isEnabled;
 }
 
 // ------------------------------------------------------------------------
@@ -31,7 +31,7 @@ void RasterizerUtility::setDepthMethod(const DepthMethods depthMethod)
             break;
     }
 
-    //LOG(INFO) << "Depth method set to " << depthMethod;
+    LOG(INFO) << "Depth method set to " << static_cast<int>(depthMethod);
 }
 
 // ------------------------------------------------------------------------
@@ -44,7 +44,7 @@ void RasterizerUtility::setBlendState(const bool blendState)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //LOG(INFO) << "Blend State set to " << blendState;
+    LOG(INFO) << "Blend State set to " << blendState;
 }
 
 // ------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void RasterizerUtility::setSupersampleState(const bool supersampleState)
     else
         glDisable(GL_MULTISAMPLE);
 
-    //LOG(INFO) << "Supersample state set to " <<  supersampleState;
+    LOG(INFO) << "Supersample state set to " <<  supersampleState;
 }
 
 // ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void RasterizerUtility::enableFaceCulling()
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    //LOG(INFO) << "Face culling enabled";
+    LOG(INFO) << "Face culling enabled";
 }
 
 // ------------------------------------------------------------------------
@@ -76,5 +76,5 @@ void RasterizerUtility::setWireframeDrawingState(const bool drawWireframe)
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    //LOG(INFO) << "Wireframe state set to " << drawWireframe;
+    LOG(INFO) << "Wireframe state set to " << drawWireframe;
 }

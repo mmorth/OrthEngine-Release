@@ -12,7 +12,7 @@ GlobalSettings::GlobalSettings()
 {
     loadConfig("GlobalConfig.json");
 
-    //LOG(INFO) << "Global settings loaded";
+    LOG(INFO) << "Global settings loaded";
 }
 
 // ------------------------------------------------------------------------

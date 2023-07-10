@@ -10,6 +10,9 @@ target_link_libraries(Rasterizer PUBLIC
 	GLM
 	glad
 	${FREETYPE_LIBRARIES}
+	${G3LOG_LIBRARIES}
 )
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

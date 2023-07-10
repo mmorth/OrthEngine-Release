@@ -32,30 +32,23 @@ constexpr int FRAMEBUFFER_HEIGHT = 800;
 class EngineAppTestRenderTestable : public EngineApp
 {
 public:
-    EngineAppTestRenderTestable()
-        : EngineApp() {}
+    EngineAppTestRenderTestable(bool isTestRender)
+        : EngineApp(isTestRender) {}
 
     // ===============================================================
     // Protected Accessors
     // ===============================================================
     std::shared_ptr<RenderObjectManager> getRenderObjectManager() { return m_renderObjectManager; }
-
-    // ===============================================================
-    // Mock Methods
-    // ===============================================================
-    MOCK_METHOD(std::chrono::time_point<std::chrono::high_resolution_clock>, getCurrentTime, ());
 };
 
 // ------------------------------------------------------------------------
 class IntegrationTest : public OpenGLTestFixture
 {
 public:
-    static std::shared_ptr<Window> s_window;
-    static std::shared_ptr<RenderObjectManager> s_renderObjectManager;
-    static std::shared_ptr<Camera> s_camera;
     static ::testing::StrictMock<EngineAppTestRenderTestable>* s_engineAppTestable;
 
-    void writeVectorToFile(const std::vector<int>& data, const std::string& filename) 
+    // ------------------------------------------------------------------------
+    void writeVectorToFile(const std::vector<unsigned char>& data, const std::string& filename) 
     {
         std::ofstream file(filename, std::ios::binary);
         if (!file) {
@@ -68,11 +61,12 @@ public:
         file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
 
         // Write the vector data
-        file.write(reinterpret_cast<const char*>(data.data()), sizeof(int) * size);
+        file.write(reinterpret_cast<const char*>(data.data()), sizeof(unsigned char) * size);
 
         file.close();
     }
 
+    // ------------------------------------------------------------------------
     std::vector<unsigned char> readVectorFromFile(const std::string& filename) 
     {
         std::ifstream file(filename, std::ios::binary);
@@ -87,16 +81,17 @@ public:
 
         // Read the vector data
         std::vector<unsigned char> data(size);
-        file.read(reinterpret_cast<char*>(data.data()), sizeof(int) * size);
+        file.read(reinterpret_cast<char*>(data.data()), sizeof(unsigned char) * size);
 
         file.close();
 
         return data;
     }
 
+    // ------------------------------------------------------------------------
     double renderComparison(std::vector<unsigned char> referencePixels, std::vector<unsigned char> testPixels)
     {
-        double squaredDifference = 0.0;
+        unsigned int squaredDifference = 0.0;
         for (size_t i = 0; i < testPixels.size(); i += 4)
         {
             int redDiff = referencePixels[i] - testPixels[i];
@@ -113,19 +108,12 @@ protected:
     static void SetUpTestCase()
     {
         OpenGLTestFixture::SetUpTestCase();
-        s_window = std::make_shared<Window>();
-        s_renderObjectManager = std::make_shared<RenderObjectManager>();
-        s_camera = std::make_shared<Camera>();
 
         s_engineAppTestable = new ::testing::StrictMock<EngineAppTestRenderTestable>(true);
-        s_engineAppTestable->initialize(s_window, s_renderObjectManager, s_camera);
     }
 
     static void TearDownTestCase()
     {
-        s_window.reset();
-        s_renderObjectManager.reset();
-        s_camera.reset();
         delete s_engineAppTestable;
 
         OpenGLTestFixture::TearDownTestCase();
@@ -133,23 +121,21 @@ protected:
 
 };
 
-std::shared_ptr<Window> IntegrationTest::s_window;
-std::shared_ptr<RenderObjectManager> IntegrationTest::s_renderObjectManager;
-std::shared_ptr<Camera> IntegrationTest::s_camera;
 ::testing::StrictMock<EngineAppTestRenderTestable>* IntegrationTest::s_engineAppTestable;
 
 // ------------------------------------------------------------------------
 TEST_F(IntegrationTest, RunEngineAppCallsCorrectMocks)
 {
-    EXPECT_CALL(*s_engineAppTestable, getCurrentTime()).Times(1)
-        .WillOnce(::testing::Return(std::chrono::time_point<std::chrono::high_resolution_clock>(std::chrono::seconds(1))));
-
     s_engineAppTestable->run();
 
     std::vector<unsigned char> testPixels = s_engineAppTestable->getRenderObjectManager()->getFramebufferContent();
+
+    // TODO: Make this more user-friendly to avoid having to uncomment this every time CMake is reran
+    //writeVectorToFile(testPixels, "ReferenceRenderBuffer.data");
+
     std::vector<unsigned char> referencePixels = readVectorFromFile("ReferenceRenderBuffer.data");
 
-    unsigned int diffThreshold = 100;
+    unsigned int diffThreshold = 10;
     unsigned int testRefDiff = renderComparison(referencePixels, testPixels);
     std::cout << "testRefDiff = " << testRefDiff << "\n";
     EXPECT_TRUE(testRefDiff < diffThreshold);

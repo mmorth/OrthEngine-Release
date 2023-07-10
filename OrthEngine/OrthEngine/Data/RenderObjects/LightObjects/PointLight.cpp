@@ -7,13 +7,13 @@ PointLight::PointLight(const std::vector<std::shared_ptr<Shader>> shaderPtrs, co
     , m_objectMaterialProperties(objectMaterialProperties)
     , m_attenuationParams(attenuationParams)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 PointLight::~PointLight()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -29,7 +29,7 @@ void PointLight::render(const std::array<float, MathUtils::MAT4_SIZE>& projectio
 
     LightObject::render(projectionMatrix, viewMatrix);
 
-    //LOG(INFO) << "Render LightObject";
+    LOG(INFO) << "Render LightObject";
 }
 
 // ------------------------------------------------------------------------
@@ -55,6 +55,6 @@ void PointLight::updateLightProperties()
         }
     }
 
-    //LOG(INFO) << "Update PointLight properties";
+    LOG(INFO) << "Update PointLight properties";
 }
 

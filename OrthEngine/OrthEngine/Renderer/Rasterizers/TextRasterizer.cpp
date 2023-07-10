@@ -7,13 +7,13 @@ TextRasterizer::TextRasterizer(const VertexData& vertexProperties)
     , m_VBO(0)
     , m_characters()
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 TextRasterizer::~TextRasterizer()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -105,7 +105,7 @@ unsigned int TextRasterizer::createNewVAO(const std::shared_ptr<Shader>& shader)
 
     m_VAOs.push_back(m_VAO);
 
-    //LOG(INFO) << "New Text VAO ID " << m_VAO << " created";
+    LOG(INFO) << "New Text VAO ID " << m_VAO << " created";
 
     return m_VAO;
 }
@@ -128,7 +128,7 @@ void TextRasterizer::drawArrays(const TextProperties& textProperties)
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    //LOG(INFO) << "Draw TextRasterizer Arrays";
+    LOG(INFO) << "Draw TextRasterizer Arrays";
 }
 
 // ------------------------------------------------------------------------

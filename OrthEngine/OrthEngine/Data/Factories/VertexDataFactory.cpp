@@ -148,7 +148,7 @@ VertexDataFactory::VertexDataFactory()
     skyboxVertexData.attributesPerVertex = 3;
     m_vertexMap["Default_Skybox"] = skyboxVertexData;
 
-    //LOG(INFO) << "Default VertexData created";
+    LOG(INFO) << "Default VertexData created";
 }
 
 // ------------------------------------------------------------------------
@@ -156,14 +156,14 @@ void VertexDataFactory::addVertexData(const std::string& key, const VertexData& 
 {
     m_vertexMap.emplace(key, vertexData);
 
-    //LOG(INFO) << "Vertex data added: " << key;
+    LOG(INFO) << "Vertex data added: " << key;
 }
 
 // ------------------------------------------------------------------------
 std::optional<VertexData> VertexDataFactory::getVertexData(const std::string& key)
 {
     auto it = m_vertexMap.find(key);
-    //LOG(INFO) << "Vertex data retrieved " << key;
+    LOG(INFO) << "Vertex data retrieved " << key;
 
     if (it != m_vertexMap.end())
         return it->second;

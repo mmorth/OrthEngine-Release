@@ -5,7 +5,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
     : m_isTestRun(false)
     , m_ID(0)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 
     // Read the vertex and fragment code from a file
     std::string vertexCodeString = readShaderFromFile(vertexPath);
@@ -28,7 +28,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
     compileProgramShader(vertexShaderID, fragmentShaderID, geometryShaderID);
     deleteShaders(vertexShaderID, fragmentShaderID);
 
-    //LOG(INFO) << "New shader ID " << m_ID << " created";
+    LOG(INFO) << "New shader ID " << m_ID << " created";
 
     // Use the shader
     use();
@@ -37,7 +37,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 // ------------------------------------------------------------------------
 Shader::~Shader() 
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
     
     if (!m_isTestRun)
         glDeleteProgram(m_ID);

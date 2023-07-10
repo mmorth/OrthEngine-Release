@@ -1,6 +1,10 @@
 #ifndef RENDEROBJECTMANAGER_HPP
 #define RENDEROBJECTMANAGER_HPP
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 #include "GlobalSettingsConstants/GlobalSettings.hpp"
 #include "Factories/FramebufferFactory.hpp"
 #include "Rasterizers/RasterizerUtility.hpp"

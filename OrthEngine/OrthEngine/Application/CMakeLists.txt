@@ -9,8 +9,11 @@ target_link_libraries(EngineApp PRIVATE
 	Texture
 	Transform
 	Window
+	${G3LOG_LIBRARIES}
 )
 
 add_subdirectory(EventSystem)
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

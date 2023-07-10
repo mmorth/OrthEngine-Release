@@ -25,7 +25,7 @@ ShaderFactory::ShaderFactory()
 	m_shaderMap["Default_Normal"] = std::make_shared<Shader>("normal_shader.vert", "normal_shader.frag", "normal_shader.geom");
 	m_shaderMap["Default_InstancedNormal"] = std::make_shared<Shader>("instanced_normal_shader.vert", "normal_shader.frag", "normal_shader.geom");
 
-	//LOG(INFO) << "Default shaders created";
+	LOG(INFO) << "Default shaders created";
 }
 
 // ------------------------------------------------------------------------
@@ -33,14 +33,14 @@ void ShaderFactory::addShader(const std::string& key, const ShaderFileNames& sha
 {
 	m_shaderMap.emplace(key, std::make_shared<Shader>(shader.fragmentShader.c_str(), shader.fragmentShader.c_str(), shader.geometryShader.c_str()));
 
-	//LOG(INFO) << "Shader added: " << key;
+	LOG(INFO) << "Shader added: " << key;
 }
 
 // ------------------------------------------------------------------------
 std::optional<std::shared_ptr<Shader>> ShaderFactory::getShader(const std::string& key)
 {
 	auto it = m_shaderMap.find(key);
-	//LOG(INFO) << "Shader retrieved " << key;
+	LOG(INFO) << "Shader retrieved " << key;
 
 	if (it != m_shaderMap.end())
 		return it->second;

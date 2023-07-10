@@ -10,6 +10,9 @@
 #include <vector>
 
 #include <glad/glad.h>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
 
 #include "../Externals/stb_image/stb_image.h"
 

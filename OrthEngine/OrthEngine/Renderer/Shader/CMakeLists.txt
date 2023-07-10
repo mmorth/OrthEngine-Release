@@ -9,6 +9,7 @@ target_link_libraries(Shader PUBLIC
 	GLFW
 	GLM
 	glad
+	${G3LOG_LIBRARIES}
 )
 
 # Add shader files to CMake output
@@ -21,4 +22,6 @@ foreach(file ${SHADER_SOURCES})
   configure_file(${file} ${CMAKE_BINARY_DIR}/bin COPYONLY)
 endforeach()
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

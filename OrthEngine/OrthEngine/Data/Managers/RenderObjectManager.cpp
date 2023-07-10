@@ -14,13 +14,13 @@ RenderObjectManager::RenderObjectManager()
 	, m_playerIDs()
 	, m_testFramebufferContents()
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 RenderObjectManager::~RenderObjectManager()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -35,7 +35,7 @@ void RenderObjectManager::initialize(const std::shared_ptr<FramebufferFactory> f
 		m_renderObjectSceneCreator = renderObjectSceneCreator;
 		m_framebuffer = framebufferFactory->getFramebuffer();
 
-		//LOG(INFO) << "test mocks set";
+		LOG(INFO) << "test mocks set";
 	}
 
 	// Create reserved objects for tracking within manager
@@ -44,11 +44,11 @@ void RenderObjectManager::initialize(const std::shared_ptr<FramebufferFactory> f
 	fpsTextConfig.textProperties = { "", {10.0f, 775.0f}, 0.5f, {1.0f, 1.0f, 1.0f} };
 	m_renderObjects.emplace(m_fpsTextID, m_renderObjectFactory->createRenderObject(fpsTextConfig).value());
 
-	//LOG(INFO) << "FPS object created";
+	LOG(INFO) << "FPS object created";
 
 	loadScene(m_renderObjectSceneCreator->createExperimentalScene());
 
-	//LOG(INFO) << "Experimental scene loaded";
+	LOG(INFO) << "Experimental scene loaded";
 }
 
 // ------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void RenderObjectManager::createRenderObject(const RenderObjectConfig& renderObj
 	// Check if Skybox object, if so, store the shared_ptr in m_skyboxObject
 	if (auto skyboxObj = dynamic_cast<SkyboxObject*>(renderObjectPtr.get()))
 	{
-		//LOG(INFO) << "SkyboxObject updated";
+		LOG(INFO) << "SkyboxObject updated";
 		m_skyboxObject = std::make_unique<SkyboxObject>(*skyboxObj);
 		return;
 	}
@@ -80,7 +80,7 @@ void RenderObjectManager::createRenderObject(const RenderObjectConfig& renderObj
 	// Create instanced objects if exists
 	for (std::size_t index = 0; index < renderObjectConfig.instancedObjectProperties.textureIDs.size(); index++)
 	{
-		//LOG(INFO) << "Instanced object created " << index;
+		LOG(INFO) << "Instanced object created " << index;
 		std::array<float, MathUtils::MAT4_SIZE> curModelMat = renderObjectConfig.instancedObjectProperties.modelMat.at(index);
 		createInstancedObject(renderObjectPtr.get(), curModelMat, renderObjectConfig.instancedObjectProperties.textureIDs.at(index));
 	}
@@ -88,14 +88,14 @@ void RenderObjectManager::createRenderObject(const RenderObjectConfig& renderObj
 	// Set object properties if needed
 	if (renderObjectConfig.renderObjectProperties.geometryType == GeometryTypes::INSTANCED_POINT_LIGHT)
 	{
-		//LOG(INFO) << "PointLight created";
+		LOG(INFO) << "PointLight created";
 		auto pointLight = dynamic_cast<PointLight*>(renderObjectPtr.get());
 		updatePointLight(pointLight);
 	}
 
 	// Store the resulting object in the RenderObject list
 	m_renderObjects.emplace(m_curID, std::move(renderObjectPtr));
-	//LOG(INFO) << "New object added " << m_curID;
+	LOG(INFO) << "New object added " << m_curID;
 
 	// Track as player if current object is a player
 	if (renderObjectConfig.renderObjectProperties.isPlayer)
@@ -125,7 +125,7 @@ bool RenderObjectManager::updateRenderObject(const RenderObjectProperties& rende
 {
 	// TODO: Implement this function once you determine what the EngineApp workflow will look like
 
-	//LOG(INFO) << "RenderObject updated";
+	LOG(INFO) << "RenderObject updated";
 
 	return false;
 }
@@ -135,7 +135,7 @@ void RenderObjectManager::createInstancedObject(RenderObject* renderObjectPtr, c
 {
 	// This conversion should always succeed because RenderObjectFactory should always return a InstancedObject type when GeometryTypes::INSTANCED_* passed
 	InstancedObject* instancedLightPtr = dynamic_cast<InstancedObject*>(renderObjectPtr);
-	//LOG(INFO) << "Instanced object created";
+	LOG(INFO) << "Instanced object created";
 
 	if (instancedLightPtr != nullptr)
 		instancedLightPtr->addInstancedObject(modelMatrix, textureID);
@@ -147,7 +147,7 @@ void RenderObjectManager::createInstancedObject(RenderObject* renderObjectPtr, c
 bool RenderObjectManager::removeInstancedObjectWithID(const unsigned int renderObjectID, const unsigned int instancedID)
 {
 	auto it = m_renderObjects.find(renderObjectID);
-	//LOG(INFO) << "Instanced object removed " << renderObjectID;
+	LOG(INFO) << "Instanced object removed " << renderObjectID;
 
 	if (it != m_renderObjects.end())
 	{
@@ -167,7 +167,7 @@ bool RenderObjectManager::removeInstancedObjectWithID(const unsigned int renderO
 // ------------------------------------------------------------------------
 void RenderObjectManager::removeObjectWithID(const unsigned int objectID)
 {
-	//LOG(INFO) << "Remove object " << objectID;
+	LOG(INFO) << "Remove object " << objectID;
 
 	m_renderObjects.erase(objectID);
 }
@@ -177,7 +177,7 @@ void RenderObjectManager::updatePointLight(RenderObject* renderObjectPtr)
 {
 	// This conversion should always succeed because RenderObjectFactory should always return a PointLight when GeometryTypes::INSTANCED_POINT_LIGHT passed
 	PointLight* pointLight = dynamic_cast<PointLight*>(renderObjectPtr);
-	//LOG(INFO) << "PointLight updated";
+	LOG(INFO) << "PointLight updated";
 
 	if (pointLight != nullptr)
 		pointLight->updateLightProperties();
@@ -191,7 +191,7 @@ void RenderObjectManager::updateFramebufferSize(const int screenWidth, const int
 	m_framebuffer->updateFramebufferSize(screenWidth, screenHeight, GlobalSettings::getInstance().getValue<bool>("msaaEnabled", false));
 	m_framebuffer->updateRenderbufferSize(screenWidth, screenHeight);
 
-	//LOG(INFO) << "Framebuffer size updated";
+	LOG(INFO) << "Framebuffer size updated";
 }
 
 // ------------------------------------------------------------------------
@@ -204,7 +204,7 @@ TransformationMatrices RenderObjectManager::getTransformationMatrices(const std:
 	std::array<float, MathUtils::MAT4_SIZE> viewMatrix = camera->GetViewMatrix();
 	MathUtils::Vec3 frontMatrix = camera->GetFrontVector();
 
-	//LOG(INFO) << "Transformation matrix updated";
+	LOG(INFO) << "Transformation matrix updated";
 
 	return { projectionMatrix, viewMatrix, frontMatrix };
 }
@@ -215,7 +215,7 @@ void RenderObjectManager::renderAll(TransformationMatrices& transformationMatric
 	// Pre-render loop setup
 	renderLoopSetup(renderLoopConfigOptions.setupTeardownSettings);
 
-	//LOG(INFO) << "Render all objects";
+	LOG(INFO) << "Render all objects";
 
 	// Render SkyboxObject first if exists to prevent drawing on top of other objects
 	if (m_skyboxObject.get() != nullptr)
@@ -244,7 +244,7 @@ void RenderObjectManager::renderAll(TransformationMatrices& transformationMatric
 // ------------------------------------------------------------------------
 void RenderObjectManager::renderLoopSetup(const SetupTeardownSettings& setupTeardownSettings)
 {
-	//LOG(INFO) << "Render loop setup";
+	LOG(INFO) << "Render loop setup";
 
 	// Setup framebuffer
 	if (setupTeardownSettings.framebufferEnabled)
@@ -262,7 +262,7 @@ void RenderObjectManager::renderLoopSetup(const SetupTeardownSettings& setupTear
 // ------------------------------------------------------------------------
 void RenderObjectManager::renderLoopCleanup(const TransformationMatrices& transformationMatrices, const SetupTeardownSettings& setupTeardownSettings)
 {
-	//LOG(INFO) << "Render loop cleanup";
+	LOG(INFO) << "Render loop cleanup";
 
 	// Render object normals
 	if (setupTeardownSettings.drawNormals)

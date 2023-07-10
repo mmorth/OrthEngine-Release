@@ -7,7 +7,7 @@ Camera::Camera(const MathUtils::Vec3& position, const MathUtils::Vec3& front, co
     , m_cameraAngles(cameraAngles)
     , m_cameraOptions(cameraOptions)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
     
     // Update camera vectors
     ProcessMouseMovement(0.0f, 0.0f, true);
@@ -18,7 +18,7 @@ Camera::Camera(const MathUtils::Vec3& position, const MathUtils::Vec3& front, co
 // ------------------------------------------------------------------------
 Camera::~Camera()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------

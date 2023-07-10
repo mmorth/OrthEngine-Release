@@ -1,6 +1,7 @@
-﻿# CMakeList.txt : Top-level CMake project file, do global configuration
-# and include sub-projects here.
-#
+﻿# Build options
+option(BUILD_TESTS "Build Unit and Integration Tests" OFF)
+
+# Root-level project CMake
 cmake_minimum_required (VERSION 3.17)
 
 project ("OrthEngine")

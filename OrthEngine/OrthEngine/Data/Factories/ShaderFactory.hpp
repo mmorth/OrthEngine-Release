@@ -5,6 +5,10 @@
 #include <optional>
 #include <unordered_map>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 #include "Shader/Shader.hpp"
 
 struct ShaderFileNames 

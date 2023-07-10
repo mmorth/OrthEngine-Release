@@ -11,7 +11,7 @@ Rasterizer::Rasterizer(const VertexData& vertexProperties)
     glBindBuffer(GL_ARRAY_BUFFER, m_attribVBO);
     glBufferData(GL_ARRAY_BUFFER, vertexProperties.vertexAttributes.size() * sizeof(float), vertexProperties.vertexAttributes.data(), GL_STATIC_DRAW);
 
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
@@ -22,7 +22,7 @@ Rasterizer::~Rasterizer()
     for (unsigned int VAO : m_VAOs)
         glDeleteVertexArrays(1, &VAO);
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -49,7 +49,7 @@ unsigned int Rasterizer::createNewVAO()
     // Add new VAO to m_VAOs
     m_VAOs.push_back(VAO);
 
-    //LOG(INFO) << "New rasterizer VAO ID " << VAO;
+    LOG(INFO) << "New rasterizer VAO ID " << VAO;
 
     return VAO;
 }
@@ -71,7 +71,7 @@ void Rasterizer::activateTextures(const TextureMaps& textureMaps)
     if (textureMaps.specularMap != 0)
         activateTexture(textureMaps.specularMap);
 
-    //LOG(INFO) << "Textures activated: Diffuse ID " << textureMaps.diffuseMap << " , Specular ID " << textureMaps.specularMap;
+    LOG(INFO) << "Textures activated: Diffuse ID " << textureMaps.diffuseMap << " , Specular ID " << textureMaps.specularMap;
 }
 
 // ------------------------------------------------------------------------

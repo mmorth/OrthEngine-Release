@@ -5,7 +5,7 @@ DirectionalLight::DirectionalLight(const std::vector<std::shared_ptr<Shader>> sh
 	: RenderObject(shaderPtrs.at(0))
 	, m_shaders(shaderPtrs)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 
 	setDirectionLightParams(lightProperties, phongLightProperties);
 }
@@ -13,7 +13,7 @@ DirectionalLight::DirectionalLight(const std::vector<std::shared_ptr<Shader>> sh
 // ------------------------------------------------------------------------
 DirectionalLight::~DirectionalLight()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -32,5 +32,5 @@ void DirectionalLight::setDirectionLightParams(const LightProperties& lightPrope
 		shader->setVec3("directionalLight.specular", &phongLightProperties.specular.x);
 	}
 
-	//LOG(INFO) << "Set DirectionalLight params";
+	LOG(INFO) << "Set DirectionalLight params";
 }

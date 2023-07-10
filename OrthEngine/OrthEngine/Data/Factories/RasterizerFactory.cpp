@@ -19,7 +19,7 @@ RasterizerFactory::RasterizerFactory()
     , m_textRasterizer(std::make_shared<TextRasterizer>(m_vertexDataFactory.getVertexData("Default_Quad").value()))
     , m_pointLightRasterizer(std::make_shared<InstancedRasterizer>(m_vertexDataFactory.getVertexData("Default_Cube").value(), std::vector<std::array<float, MathUtils::MAT4_SIZE>>{}, std::vector<float>{}))
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 
     setRasterizerDefault();
 }
@@ -37,7 +37,7 @@ void RasterizerFactory::setRasterizerDefault()
 // ------------------------------------------------------------------------
 std::optional<std::shared_ptr<Rasterizer>> RasterizerFactory::getRasterizer(const GeometryTypes geometryTypes)
 {
-    //LOG(INFO) << "Rasterizer retrieved: " << geometryTypes;
+    LOG(INFO) << "Rasterizer retrieved: " << static_cast<int>(geometryTypes);
 
     switch (geometryTypes)
     {

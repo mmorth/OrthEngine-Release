@@ -4,13 +4,13 @@
 FirstPersonCamera::FirstPersonCamera(const MathUtils::Vec3& position, const MathUtils::Vec3& front, const CameraAngles& cameraAngles, const CameraOptions& cameraOptions)
     : Camera(position, front, cameraAngles, cameraOptions)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 FirstPersonCamera::~FirstPersonCamera()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------

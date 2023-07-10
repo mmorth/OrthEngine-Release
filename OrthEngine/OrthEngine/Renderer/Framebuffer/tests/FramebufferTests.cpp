@@ -126,9 +126,9 @@ TEST_F(FramebufferTest, CreateFramebufferProperlySetsMemberVariables)
     GLint numVertexAttribs;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &numVertexAttribs);
 
-    GLuint numVertexAttributes = 2;
+    GLint numVertexAttributes = 2;
     glBindVertexArray(s_framebufferTestable->getQuadVAO());
-    for (GLuint attribIndex = 0; attribIndex < numVertexAttribs; ++attribIndex)
+    for (GLint attribIndex = 0; attribIndex < numVertexAttribs; ++attribIndex)
     {
         GLint enabled; glGetVertexAttribiv(attribIndex, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &enabled);
         if (attribIndex < numVertexAttributes)

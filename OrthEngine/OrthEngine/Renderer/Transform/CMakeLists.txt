@@ -17,4 +17,6 @@ target_link_libraries(Transform PUBLIC
 	${G3LOG_LIBRARIES}
 )
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

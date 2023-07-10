@@ -5,13 +5,13 @@ LightObject::LightObject(const std::shared_ptr<Shader> shaderPtr, const std::sha
 	: InstancedObject(shaderPtr, rasterizer)
 	, m_phongLightParams(phongLightProperties)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 LightObject::~LightObject()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -19,5 +19,5 @@ void LightObject::render(const std::array<float, MathUtils::MAT4_SIZE>& projecti
 {
 	InstancedObject::render(projectionMatrix, viewMatrix);
 
-	//LOG(INFO) << "LightObject Render";
+	LOG(INFO) << "LightObject Render";
 }

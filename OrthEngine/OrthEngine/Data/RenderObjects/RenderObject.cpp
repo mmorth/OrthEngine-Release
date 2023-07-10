@@ -4,13 +4,13 @@
 RenderObject::RenderObject(const std::shared_ptr<Shader> shaderPtr)
     : m_shader(shaderPtr)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 RenderObject::~RenderObject()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -19,7 +19,7 @@ void RenderObject::render(const std::array<float, MathUtils::MAT4_SIZE>& project
     // Render object with default object shader
     renderObject(m_shader, projectionMatrix, viewMatrix);
 
-    //LOG(INFO) << "Render RenderObject";
+    LOG(INFO) << "Render RenderObject";
 }
 
 // ------------------------------------------------------------------------
@@ -28,7 +28,7 @@ void RenderObject::drawNormals(const std::shared_ptr<Shader> shaderPtr, std::arr
     // Render object with normal shader
     renderObject(shaderPtr, projectionMatrix, viewMatrix);
 
-    //LOG(INFO) << "Render RenderObject normals";
+    LOG(INFO) << "Render RenderObject normals";
 }
 
 // ------------------------------------------------------------------------

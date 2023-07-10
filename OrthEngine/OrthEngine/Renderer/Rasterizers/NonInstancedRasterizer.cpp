@@ -4,7 +4,7 @@
 NonInstancedRasterizer::NonInstancedRasterizer(const VertexData& vertexProperties)
     : Rasterizer(vertexProperties)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
@@ -12,7 +12,7 @@ NonInstancedRasterizer::~NonInstancedRasterizer()
 {
     Rasterizer::~Rasterizer();
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -27,5 +27,5 @@ void NonInstancedRasterizer::drawArrays(const unsigned int VAO, const unsigned i
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, m_numVertices);
 
-    //LOG(INFO) << "Draw NonInstanced Rasterizer Arrays";
+    LOG(INFO) << "Draw NonInstanced Rasterizer Arrays";
 }

@@ -8,13 +8,13 @@ InstancedObject::InstancedObject(const std::shared_ptr<Shader> shaderPtr, const 
 	, m_textureIDs()
 	, m_VAO(m_rasterizer->createNewVAO())
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 InstancedObject::~InstancedObject()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -24,7 +24,7 @@ void InstancedObject::render(const std::array<float, MathUtils::MAT4_SIZE>& proj
 	RenderObject::render(projectionMatrix, viewMatrix);
 	renderObject(m_shader, projectionMatrix, viewMatrix);
 
-	//LOG(INFO) << "Render InstancedObject";
+	LOG(INFO) << "Render InstancedObject";
 }
 
 // ------------------------------------------------------------------------
@@ -34,7 +34,7 @@ void InstancedObject::drawNormals(const std::shared_ptr<Shader> shaderPtr, std::
 	RenderObject::drawNormals(shaderPtr, projectionMatrix, viewMatrix);
 	renderObject(shaderPtr, projectionMatrix, viewMatrix);
 
-	//LOG(INFO) << "Render NonInstancedObject Normals";
+	LOG(INFO) << "Render NonInstancedObject Normals";
 }
 
 // ------------------------------------------------------------------------
@@ -47,7 +47,7 @@ void InstancedObject::addInstancedObject(const std::array<float, MathUtils::MAT4
 	m_rasterizer->updateModelMatrices(m_modelMatrices);
 	m_rasterizer->updateTextureLayerIDs(m_textureIDs);
 
-	//LOG(INFO) << "Add instanced object " << textureID;
+	LOG(INFO) << "Add instanced object " << textureID;
 }
 
 // ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void InstancedObject::removeInstancedObject(const unsigned int index)
 		m_rasterizer->updateModelMatrices(m_modelMatrices);
 		m_rasterizer->updateTextureLayerIDs(m_textureIDs);
 
-		//LOG(INFO) << "Instanced object removed at index " << index;
+		LOG(INFO) << "Instanced object removed at index " << index;
 	}
 }
 

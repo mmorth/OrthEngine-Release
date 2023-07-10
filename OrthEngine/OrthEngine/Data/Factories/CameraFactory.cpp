@@ -10,7 +10,7 @@ CameraFactory& CameraFactory::getInstance()
 // ------------------------------------------------------------------------
 std::unique_ptr<Camera> CameraFactory::getCamera(const CameraTypes cameraTypes, const MathUtils::Vec3& position, const MathUtils::Vec3& front)
 {
-    //LOG(INFO) << "Camera created: " << cameraTypes;
+    LOG(INFO) << "Camera created: " << static_cast<int>(cameraTypes);
 
     switch (cameraTypes)
     {

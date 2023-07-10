@@ -2,15 +2,32 @@
 
 // ------------------------------------------------------------------------
 EngineApp::EngineApp(const bool isTestRender)
-	: m_window(std::make_shared<Window>(WindowSettings({ { GlobalSettings::getInstance().getValue<float>("windowWidth", 1200), GlobalSettings::getInstance().getValue<float>("windowHeight", 800) }, GlobalSettings::getInstance().getValue<std::string>("windowName", "OrthEngine"), GlobalSettings::getInstance().getValue<bool>("limitFps", true)},
-		{GlobalSettings::getInstance().getValue<int>("majorVersion", 3), GlobalSettings::getInstance().getValue<int>("minorVersion", 3), GlobalSettings::getInstance().getValue<int>("numSamples", 4), GlobalSettings::getInstance().getValue<bool>("testingError", false)})))
+	: m_window(
+		std::make_shared<Window>(
+			WindowSettings(
+				{ 
+					{
+						GlobalSettings::getInstance().getValue<float>("windowWidth", 1200), 
+						GlobalSettings::getInstance().getValue<float>("windowHeight", 800) }, 
+						GlobalSettings::getInstance().getValue<std::string>("windowName", "OrthEngine"), 
+						GlobalSettings::getInstance().getValue<bool>("limitFps", true)
+				},
+				{
+					GlobalSettings::getInstance().getValue<int>("majorVersion", 3), 
+					GlobalSettings::getInstance().getValue<int>("minorVersion", 3), 
+					GlobalSettings::getInstance().getValue<int>("numSamples", 4), 
+					GlobalSettings::getInstance().getValue<bool>("testingError", false)
+				}
+			)
+		)
+	)
 	, m_renderObjectManager(std::make_shared<RenderObjectManager>())
 	, m_camera(CameraFactory::getInstance().getCamera(CameraTypes::FIRST_PERSON, MathUtils::Vec3{ 0.0f, 1.0f, 3.0f }))
 	, m_deltaTime(0.0f)
 	, m_lastFrame(0.0f)
 	, m_isTestRender(isTestRender)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 
 	// Initialize RenderObjectManager
 	m_renderObjectManager->initialize();
@@ -40,7 +57,7 @@ EngineApp::EngineApp(const bool isTestRender)
 		m_renderObjectManager->updateFramebufferSize(screenSize.first, screenSize.second);
 	});
 
-	//LOG(INFO) << "Window Callbacks set";
+	LOG(INFO) << "Window Callbacks set";
 }
 
 // ------------------------------------------------------------------------
@@ -53,7 +70,7 @@ void EngineApp::initialize(const std::shared_ptr<Window> window, const std::shar
 	m_renderObjectManager = renderObjectManager;
 	m_camera = camera;
 
-	//LOG(INFO) << "EngineApp mocks set";
+	LOG(INFO) << "EngineApp mocks set";
 }
 
 // ------------------------------------------------------------------------
@@ -63,7 +80,7 @@ void EngineApp::run()
 	std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 	unsigned int frames = 0;
 
-	//LOG(INFO) << "===== Main Render Loop =====";
+	LOG(INFO) << "===== Main Render Loop =====";
 
 	// Main render loop
 	while (!m_window->shouldCloseWindow())
@@ -92,6 +109,10 @@ void EngineApp::run()
 
 		// Calculate FPS
 		calculateFps(start, frames);
+
+		// Break out of the render loop if this is a test render
+		if (m_isTestRender)
+			break;
 	}
 }
 

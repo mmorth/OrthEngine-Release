@@ -5,13 +5,13 @@ GeometricInstancedObject::GeometricInstancedObject(const std::shared_ptr<Shader>
 	: InstancedObject(shaderPtr, rasterizer)
 	, m_objectMaterialProperties(objectMaterialProperties)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 GeometricInstancedObject::~GeometricInstancedObject()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -27,5 +27,5 @@ void GeometricInstancedObject::render(const std::array<float, MathUtils::MAT4_SI
 
 	InstancedObject::render(projectionMatrix, viewMatrix);
 
-	//LOG(INFO) << "GeometricInstancedObject render";
+	LOG(INFO) << "GeometricInstancedObject render";
 }

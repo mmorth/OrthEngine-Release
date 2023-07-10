@@ -7,7 +7,7 @@ SkyboxObject::SkyboxObject(const std::shared_ptr<Shader> shaderPtr, const std::s
     , m_textureID(textureID)
     , m_VAO(m_rasterizer->createNewVAO())
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 
     // load skybox
     m_shader->use();
@@ -39,7 +39,7 @@ SkyboxObject::~SkyboxObject() {}
 //    // render skybox cube
 //    m_rasterizer->drawArrays(m_VAO);
 //
-//    //LOG(INFO) << "Render SkyboxObject";
+//    LOG(INFO) << "Render SkyboxObject";
 //}
 
 // ------------------------------------------------------------------------
@@ -64,5 +64,5 @@ void SkyboxObject::render(const std::array<float, MathUtils::MAT4_SIZE>& project
     // render skybox cube
     m_rasterizer->drawArrays(m_VAO);
 
-    //LOG(INFO) << "Render SkyboxObject";
+    LOG(INFO) << "Render SkyboxObject";
 }

@@ -6,6 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 #include "Rasterizers/DataStructs.hpp"
 #include "FactoryStructs.hpp"
 #include "MathUtils.hpp"

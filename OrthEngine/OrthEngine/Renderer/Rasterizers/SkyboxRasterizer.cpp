@@ -4,13 +4,13 @@
 SkyboxRasterizer::SkyboxRasterizer(const VertexData& vertexProperties)
     : Rasterizer(vertexProperties)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 SkyboxRasterizer::~SkyboxRasterizer()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -26,7 +26,7 @@ unsigned int SkyboxRasterizer::createNewVAO()
 
     m_VAOs.push_back(skyboxVAO);
 
-    //LOG(INFO) << "Create new Skybox VAO ID " << skyboxVAO;
+    LOG(INFO) << "Create new Skybox VAO ID " << skyboxVAO;
 
     return skyboxVAO;
 }
@@ -42,5 +42,5 @@ void SkyboxRasterizer::drawArrays(const unsigned int VAO, const unsigned int num
 
     glDepthFunc(GL_LESS);
 
-    //LOG(INFO) << "Draw Skybox Arrays";
+    LOG(INFO) << "Draw Skybox Arrays";
 }

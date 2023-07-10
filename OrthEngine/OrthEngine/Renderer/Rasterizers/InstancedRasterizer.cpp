@@ -6,7 +6,7 @@ InstancedRasterizer::InstancedRasterizer(const VertexData& vertexProperties, con
     , m_instancedModelMatrixVBO(0)
     , m_instancedTextureVBO(0)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
     
     // Create the instanced model matrix
     glGenBuffers(1, &m_instancedModelMatrixVBO);
@@ -24,7 +24,7 @@ InstancedRasterizer::~InstancedRasterizer()
     glDeleteBuffers(1, &m_instancedModelMatrixVBO);
     glDeleteBuffers(1, &m_instancedTextureVBO);
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -34,7 +34,7 @@ void InstancedRasterizer::updateModelMatrices(const std::vector<std::array<float
     glBufferData(GL_ARRAY_BUFFER, MathUtils::MAT4_SIZE * modelMatrices.size() * sizeof(float), modelMatrices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    //LOG(INFO) << "Update instanced model matrix VBO " << m_instancedModelMatrixVBO;
+    LOG(INFO) << "Update instanced model matrix VBO " << m_instancedModelMatrixVBO;
 }
 
 // ------------------------------------------------------------------------
@@ -44,7 +44,7 @@ void InstancedRasterizer::updateTextureLayerIDs(const std::vector<float>& textur
     glBufferData(GL_ARRAY_BUFFER, textureLayerIDs.size() * sizeof(float), textureLayerIDs.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    //LOG(INFO) << "Update instanced texture VBO " << m_instancedTextureVBO;
+    LOG(INFO) << "Update instanced texture VBO " << m_instancedTextureVBO;
 }
 
 // ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ unsigned int InstancedRasterizer::createNewVAO()
     glVertexAttribDivisor(6, 1);
     glVertexAttribDivisor(7, 1);
 
-    //LOG(INFO) << "Create instanced VAO ID " << VAO;
+    LOG(INFO) << "Create instanced VAO ID " << VAO;
 
     return VAO;
 }
@@ -87,5 +87,5 @@ void InstancedRasterizer::drawArrays(const unsigned int VAO, const unsigned int 
     glBindVertexArray(VAO);
     glDrawArraysInstanced(GL_TRIANGLES, 0, m_numVertices, numInstances);
 
-    //LOG(INFO) << "Draw Instanced rasterizer arrays";
+    LOG(INFO) << "Draw Instanced rasterizer arrays";
 }

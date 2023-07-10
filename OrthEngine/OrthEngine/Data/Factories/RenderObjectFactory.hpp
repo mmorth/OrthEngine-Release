@@ -3,6 +3,10 @@
 
 #include <unordered_set>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 #include "Camera/Camera.hpp"
 #include "FactoryStructs.hpp"
 #include "ShaderFactory.hpp"

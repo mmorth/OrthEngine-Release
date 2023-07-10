@@ -18,7 +18,7 @@ std::vector<TextureArrayData> TextureFactory::s_defaultTextureArray =
 TextureFactory::TextureFactory()
     : m_numTextures(0)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 
     createDefaultTextures();
 }
@@ -28,7 +28,7 @@ TextureFactory::~TextureFactory()
 {
     cleanUp();
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void TextureFactory::createDefaultTextures()
     for (const auto& textureArrayData : s_defaultTextureArray)
         generateTextureArray(textureArrayData);
 
-    //LOG(INFO) << "Default textures created";
+    LOG(INFO) << "Default textures created";
 }
 
 // ------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void TextureFactory::cleanUp()
     for (unsigned int textureID = 0; textureID < m_numTextures; textureID++)
         glDeleteTextures(1, &textureID);
 
-    //LOG(INFO) << "Textures deleted";
+    LOG(INFO) << "Textures deleted";
 }
 
 // ------------------------------------------------------------------------
@@ -92,7 +92,7 @@ unsigned int TextureFactory::createNewTexture(const std::string& path)
 
     stbi_image_free(data);
 
-    //LOG(INFO) << "New texture ID " << textureID << "created";
+    LOG(INFO) << "New texture ID " << textureID << "created";
 
     return storeTextureData(textureID, path, textureVals);
 }
@@ -147,7 +147,7 @@ unsigned int TextureFactory::generateTextureArray(const TextureArrayData& textur
     glActiveTexture(GL_TEXTURE0 + textureArray);
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
 
-    //LOG(INFO) << "New texture array ID " << textureArray << " created";
+    LOG(INFO) << "New texture array ID " << textureArray << " created";
 
     // Store texture array data and return texture array ID
     return storeTextureData(textureArray, textureArrayData.lookupName, std::vector<unsigned char>{});
@@ -195,7 +195,7 @@ unsigned int TextureFactory::loadSkybox(const SkyboxData& skyboxData)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    //LOG(INFO) << "New skybox ID " << textureID << " created";
+    LOG(INFO) << "New skybox ID " << textureID << " created";
 
     // Store the data
     return storeTextureData(textureID, skyboxData.skyboxName, std::vector<unsigned char>{});

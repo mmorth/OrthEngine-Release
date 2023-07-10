@@ -5,6 +5,10 @@
 #include <map>
 #include <vector>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 template<typename T>
 class Publisher 
 {
@@ -12,7 +16,7 @@ public:
     using callback_t = std::function<void(T)>;
     virtual void publish(T data) 
     {
-        //LOG(INFO) << "publish";
+        LOG(INFO) << "publish";
 
         for (auto& sub : subscribers_) 
         {
@@ -21,13 +25,13 @@ public:
     }
     virtual void subscribe(void* id, callback_t cb) 
     {
-        //LOG(INFO) << "New subscriber: " << id;
+        LOG(INFO) << "New subscriber: " << id;
 
         subscribers_[id] = cb;
     }
     virtual void unsubscribe(void* id) 
     {
-        //LOG(INFO) << "Subscribed removed: " << id;
+        LOG(INFO) << "Subscribed removed: " << id;
 
         subscribers_.erase(id);
     }

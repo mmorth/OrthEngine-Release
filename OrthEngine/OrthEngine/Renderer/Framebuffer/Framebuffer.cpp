@@ -5,7 +5,7 @@ Framebuffer::Framebuffer(const std::shared_ptr<Shader> shader, const VertexData&
     : m_shader(shader)
     , m_vertexData(vertexData)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
     
     // Obtain the window width and height from GlobalSettings
     unsigned int windowWidth = GlobalSettings::getInstance().getValue<unsigned int>("windowWidth", 1200);
@@ -39,7 +39,7 @@ Framebuffer::~Framebuffer()
     glDeleteVertexArrays(1, &m_quadVAO);
     glDeleteBuffers(1, &m_quadVBO);
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void Framebuffer::generateFramebuffer(const unsigned int screenWidth, const unsi
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_textureColorbuffer, 0);
 
-        //LOG(INFO) << "MSAA Framebuffer generated " << m_framebuffer;
+        LOG(INFO) << "MSAA Framebuffer generated " << m_framebuffer;
     }
     else
     {
@@ -74,7 +74,7 @@ void Framebuffer::generateFramebuffer(const unsigned int screenWidth, const unsi
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_screenTexture, 0);
 
-        //LOG(INFO) << "Non-MSAA Framebuffer generated " << m_intermediateFBO;
+        LOG(INFO) << "Non-MSAA Framebuffer generated " << m_intermediateFBO;
     }
 }
 
@@ -88,7 +88,7 @@ void Framebuffer::generateRenderbuffer(const unsigned int screenWidth, const uns
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 
-    //LOG(INFO) << "Renderbuffer generated " << m_rbo;
+    LOG(INFO) << "Renderbuffer generated " << m_rbo;
 }
 
 // ------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void Framebuffer::generateQuadVao()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-    //LOG(INFO) << "Quad VAO created " << m_quadVAO;
+    LOG(INFO) << "Quad VAO created " << m_quadVAO;
 }
 
 // ------------------------------------------------------------------------
@@ -134,7 +134,7 @@ void Framebuffer::updateFramebufferSize(const unsigned int screenWidth, const un
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    //LOG(INFO) << "Framebuffer size updated to (Width, Height) = (" << screenWidth << ", " << screenHeight << ")";
+    LOG(INFO) << "Framebuffer size updated to (Width, Height) = (" << screenWidth << ", " << screenHeight << ")";
 }
 
 // ------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void Framebuffer::updateRenderbufferSize(const unsigned int screenWidth, const u
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    //LOG(INFO) << "Renderbuffer size updated to (Width, Height) = (" << screenWidth << ", " << screenHeight << ")";
+    LOG(INFO) << "Renderbuffer size updated to (Width, Height) = (" << screenWidth << ", " << screenHeight << ")";
 }
 
 // ------------------------------------------------------------------------
@@ -163,15 +163,15 @@ void Framebuffer::bindFramebuffer(const FramebufferTypes framebufferType)
     {
         case FramebufferTypes::DEFAULT:
             framebufferID = 0;
-            //LOG(INFO) << "Bound default framebuffer";
+            LOG(INFO) << "Bound default framebuffer";
             break;
         case FramebufferTypes::MSAA:
             framebufferID = m_framebuffer;
-            //LOG(INFO) << "Bound MSAA framebuffer";
+            LOG(INFO) << "Bound MSAA framebuffer";
             break;
         case FramebufferTypes::POST:
             framebufferID = m_intermediateFBO;
-            //LOG(INFO) << "Bound post framebuffer";
+            LOG(INFO) << "Bound post framebuffer";
             break;
         default:
             break;
@@ -190,7 +190,7 @@ void Framebuffer::bindAndDrawQuadVAO()
     glBindVertexArray(m_quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    //LOG(INFO) << "Bind and draw Framebuffer quad";
+    LOG(INFO) << "Bind and draw Framebuffer quad";
 }
 
 // ------------------------------------------------------------------------
@@ -202,16 +202,16 @@ void Framebuffer::blitMSAA()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_intermediateFBO);
     glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-    //LOG(INFO) << "Framebuffer blitMSAA";
+    LOG(INFO) << "Framebuffer blitMSAA";
 }
 
 // ------------------------------------------------------------------------
 std::vector<unsigned char> Framebuffer::getFramebufferContents()
 {
     // Store framebuffer render contents
-    GLint framebufferWidth, framebufferHeight;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &framebufferWidth);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &framebufferHeight);
+    // Obtain the window width and height from GlobalSettings
+    unsigned int framebufferWidth = GlobalSettings::getInstance().getValue<unsigned int>("windowWidth", 1200);
+    unsigned int framebufferHeight = GlobalSettings::getInstance().getValue<unsigned int>("windowHeight", 800);
 
     std::vector<unsigned char> pixels(static_cast<size_t>(framebufferWidth) * static_cast<size_t>(framebufferHeight) * 4); // RGBA format
     glReadPixels(0, 0, framebufferWidth, framebufferHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());

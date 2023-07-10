@@ -5,13 +5,13 @@ GeometricNonInstancedObject::GeometricNonInstancedObject(const std::shared_ptr<S
 	: NonInstancedObject(shaderPtr, rasterizer, objectLocation)
 	, m_objectMaterialProperties(objectMaterialProperties)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 GeometricNonInstancedObject::~GeometricNonInstancedObject()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -27,5 +27,5 @@ void GeometricNonInstancedObject::render(const std::array<float, MathUtils::MAT4
 
 	NonInstancedObject::render(projectionMatrix, viewMatrix);
 
-	//LOG(INFO) << "Render GeometricNonInstancedObject";
+	LOG(INFO) << "Render GeometricNonInstancedObject";
 }

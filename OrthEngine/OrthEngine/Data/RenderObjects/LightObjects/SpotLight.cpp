@@ -5,7 +5,7 @@ SpotLight::SpotLight(const std::vector<std::shared_ptr<Shader>> shaderPtrs, cons
 	: RenderObject(shaderPtrs.at(0))
 	, m_shaders(shaderPtrs)
 {
-	//LOG(INFO) << "ctor";
+	LOG(INFO) << "ctor";
 
 	updateSpotlightParams(lightProperties, phongLightProperties, attenuationParams, spotlightCutoffParams);
 }
@@ -13,7 +13,7 @@ SpotLight::SpotLight(const std::vector<std::shared_ptr<Shader>> shaderPtrs, cons
 // ------------------------------------------------------------------------
 SpotLight::~SpotLight()
 {
-	//LOG(INFO) << "dtor";
+	LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -38,7 +38,7 @@ void SpotLight::updateSpotlightParams(const LightProperties& lightProperties, co
 		shader->setFloat("spotLight.outerCutOff", glm::cos(glm::radians(spotlightCutoffParams.outerCutoff)));
 	}
 
-	//LOG(INFO) << "Update spotlight properties";
+	LOG(INFO) << "Update spotlight properties";
 }
 
 // ------------------------------------------------------------------------
@@ -51,6 +51,6 @@ void SpotLight::updatePosition(const LightProperties& lightProperties)
 		shader->setVec3("spotLight.direction", &lightProperties.direction.x);
 	}
 
-	//LOG(INFO) << "Update spotlight position";
+	LOG(INFO) << "Update spotlight position";
 }
 

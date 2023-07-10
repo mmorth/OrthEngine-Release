@@ -13,6 +13,9 @@ target_link_libraries(Framebuffer PUBLIC
 	glad
 	Rasterizer
 	Shader
+	${G3LOG_LIBRARIES}
 )
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

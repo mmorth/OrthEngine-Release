@@ -3,6 +3,10 @@
 
 #include <iostream>
 #include <fstream>
+
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
 #include <json/json.hpp>
 
 class GlobalSettings 

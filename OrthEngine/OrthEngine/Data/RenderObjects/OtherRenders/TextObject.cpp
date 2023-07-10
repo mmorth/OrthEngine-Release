@@ -6,7 +6,7 @@ TextObject::TextObject(const std::shared_ptr<Shader> shader, const std::shared_p
     , m_rasterizer(rasterizer)
     , m_textProperties(textProperties)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
     
     // Pre-render all possible common characters to render
     m_rasterizer->createNewVAO(shader);
@@ -15,7 +15,7 @@ TextObject::TextObject(const std::shared_ptr<Shader> shader, const std::shared_p
 // ------------------------------------------------------------------------
 TextObject::~TextObject()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -27,7 +27,7 @@ void TextObject::render(const std::array<float, MathUtils::MAT4_SIZE>& projectio
 
     m_rasterizer->drawArrays(m_textProperties);
 
-    //LOG(INFO) << "Render TextObject";
+    LOG(INFO) << "Render TextObject";
 }
 
 // ------------------------------------------------------------------------

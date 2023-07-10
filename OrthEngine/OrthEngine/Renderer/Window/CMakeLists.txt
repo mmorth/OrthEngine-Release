@@ -15,6 +15,9 @@ target_link_libraries(Window PUBLIC
 	glad
 	MathUtils
 	Publisher
+	${G3LOG_LIBRARIES}
 )
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

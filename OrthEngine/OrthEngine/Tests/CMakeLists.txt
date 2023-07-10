@@ -1,3 +1,5 @@
+message("Building TestRunner")
+
 add_executable(TestRunner
     TestRunner.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Application/tests/ApplicationTests.cpp

@@ -8,13 +8,13 @@ NonInstancedObject::NonInstancedObject(const std::shared_ptr<Shader> shaderPtr, 
     , m_transform(std::make_shared<Transform>())
     , m_VAO(m_rasterizer->createNewVAO())
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
 }
 
 // ------------------------------------------------------------------------
 NonInstancedObject::~NonInstancedObject()
 {
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -24,7 +24,7 @@ void NonInstancedObject::render(const std::array<float, MathUtils::MAT4_SIZE>& p
     RenderObject::render(projectionMatrix, viewMatrix);
     renderObject(m_shader, projectionMatrix, viewMatrix);
 
-    //LOG(INFO) << "NonInstancedObject Render";
+    LOG(INFO) << "NonInstancedObject Render";
 }
 
 // ------------------------------------------------------------------------
@@ -34,7 +34,7 @@ void NonInstancedObject::drawNormals(const std::shared_ptr<Shader> shaderPtr, st
     RenderObject::drawNormals(shaderPtr, projectionMatrix, viewMatrix);
     renderObject(shaderPtr, projectionMatrix, viewMatrix);
 
-    //LOG(INFO) << "Render NonInstancedObject Normals";
+    LOG(INFO) << "Render NonInstancedObject Normals";
 }
 
 // ------------------------------------------------------------------------

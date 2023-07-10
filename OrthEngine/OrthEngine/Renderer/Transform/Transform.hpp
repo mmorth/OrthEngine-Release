@@ -5,9 +5,9 @@
 #include <iostream>
 #include <string>
 
-//#include <g3log/g3log.hpp>
-//#include <g3log/loglevels.hpp>
-//#include <g3log/logworker.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

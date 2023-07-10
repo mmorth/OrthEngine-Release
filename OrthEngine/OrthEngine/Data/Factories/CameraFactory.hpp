@@ -4,6 +4,10 @@
 #include <memory>
 #include <optional>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>
+
 #include "Camera/Camera.hpp"
 #include "Camera/FirstPersonCamera.hpp"
 #include "MathUtils.hpp"

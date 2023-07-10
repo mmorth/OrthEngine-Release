@@ -14,6 +14,9 @@ target_link_libraries(Camera PUBLIC
 	GLFW
 	glad
 	GLM
+	${G3LOG_LIBRARIES}
 )
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

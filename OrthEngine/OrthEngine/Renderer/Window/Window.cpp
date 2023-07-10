@@ -13,7 +13,7 @@ std::shared_ptr<Publisher<std::pair<double, double>>> Window::s_windowSizePublis
 // ------------------------------------------------------------------------
 Window::Window(const WindowSettings& windowSettings)
 {
-    //LOG(INFO) << "ctor";
+    LOG(INFO) << "ctor";
     
     createAndInitializeWindow(windowSettings);
 }
@@ -23,7 +23,7 @@ Window::~Window()
 {
     cleanUp();
 
-    //LOG(INFO) << "dtor";
+    LOG(INFO) << "dtor";
 }
 
 // ------------------------------------------------------------------------
@@ -89,7 +89,7 @@ void Window::createWindow(const WindowLayout& windowLayout)
     if (!windowLayout.limitFPS)
         unlimitFps();
 
-    //LOG(INFO) << "Window Created";
+    LOG(INFO) << "Window Created";
 }
 
 
@@ -230,7 +230,7 @@ bool Window::loadGladGLLoader()
 void Window::unlimitFps()
 {
     glfwSwapInterval(0);
-    //LOG(INFO) << "Unlimited FPS";
+    LOG(INFO) << "Unlimited FPS";
 }
 
 // ------------------------------------------------------------------------

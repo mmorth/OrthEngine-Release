@@ -119,7 +119,7 @@ std::vector<RenderObjectConfig> RenderObjectSceneCreator::createExperimentalScen
 	skyboxConfig.renderObjectProperties = { GeometryTypes::SKYBOX, false };
 	renderObjectConfigList.push_back(skyboxConfig);
 
-	//LOG(INFO) << "Experimental scene created";
+	LOG(INFO) << "Experimental scene created";
 
 	return renderObjectConfigList;
 }
