@@ -11,6 +11,7 @@ public:
 
     virtual void ProcessKeyboard(const CameraMovement& direction, const float deltaTime) override;
     virtual std::array<float, MathUtils::MAT4_SIZE> GetViewMatrix() override;
+    virtual void SetTarget(MathUtils::Vec3 newCameraTarget) override;
 
 protected:
     void updateCameraVectors() override;

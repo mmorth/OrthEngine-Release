@@ -4,6 +4,7 @@
 #include "Rasterizers/tests/RasterizerMock.hpp"
 #include "Shader/tests/ShaderMock.hpp"
 #include "Transform/tests/TransformMock.hpp"
+#include "ObjectStructs.hpp"
 #include "OpenGLFixture.hpp"
 
 #include "RenderObjects/RenderObject.hpp"
@@ -136,7 +137,7 @@ namespace
     }
 
     template <typename T>
-    void verifyNonInstancedConstructor(::testing::StrictMock<T>& renderObjectTestable, ObjectLocation& objectLocation)
+    void verifyNonInstancedConstructor(::testing::StrictMock<T>& renderObjectTestable, ObjectLocationOrientation& objectLocation)
     {
         // RenderObject inherited properties
         verifyRenderObjectConstructorSetsShader(renderObjectTestable);
@@ -144,16 +145,16 @@ namespace
         // Verify member properties
         EXPECT_TRUE(renderObjectTestable.getRasterizer() != nullptr);
         EXPECT_TRUE(renderObjectTestable.getVAO() == 0); // RasterizerMock sets to 0
-        EXPECT_EQ(renderObjectTestable.getObjectLocation(), objectLocation);
+        EXPECT_EQ(renderObjectTestable.getObjectLocationOrientation(), objectLocation);
     }
 
     template <typename T>
-    void verifyNonInstancedRender(::testing::StrictMock<T>& renderObjectTestable, TransformMock& transformMock, ObjectLocation& objectLocation, NonInstancedRasterizerMock& nonInstancedRasterizerMock, std::shared_ptr<ShaderMock> shaderMock, bool isDefaultRender, unsigned int useCallTimes)
+    void verifyNonInstancedRender(::testing::StrictMock<T>& renderObjectTestable, TransformMock& transformMock, ObjectLocationOrientation& objectLocation, NonInstancedRasterizerMock& nonInstancedRasterizerMock, std::shared_ptr<ShaderMock> shaderMock, bool isDefaultRender, unsigned int useCallTimes)
     {
         // Verify variables and method calls
         EXPECT_CALL(transformMock, resetMatrix(::testing::Eq(MatrixTransform::MatrixTypes::MODEL))).Times(1);
         EXPECT_CALL(transformMock, applyTranslation(::testing::Eq(MatrixTransform::MatrixTypes::MODEL), ::testing::Eq(objectLocation.position))).Times(1);
-        EXPECT_CALL(transformMock, applyScale(::testing::Eq(MatrixTransform::MatrixTypes::MODEL), ::testing::Eq(objectLocation.size))).Times(1);
+        EXPECT_CALL(transformMock, applyScale(::testing::Eq(MatrixTransform::MatrixTypes::MODEL), ::testing::Eq(objectLocation.scale))).Times(1);
         EXPECT_CALL(transformMock, applyRotation(::testing::Eq(MatrixTransform::MatrixTypes::MODEL), ::testing::Eq(objectLocation.orientation), ::testing::Eq(objectLocation.position))).Times(1);
         EXPECT_CALL(transformMock, getTransformationMatrix(::testing::Eq(MatrixTransform::MatrixTypes::MODEL))).Times(1);
         EXPECT_CALL(nonInstancedRasterizerMock, drawArrays(::testing::_, ::testing::_)).Times(1);
@@ -309,13 +310,32 @@ TEST_F(InstancedObjectTest, RemoveInstancedObjectCorrectlyDeletesModelMatrixAndT
     verifyRemoveInstancedObject(*s_instancedObjectTestable, *s_instancedRasterizerMock, 2);
 }
 
+// ------------------------------------------------------------------------
+TEST_F(InstancedObjectTest, UpdateInstancedObjectCorrectlyUpdatesModelMatrixAndTextureIdAtIndex)
+{
+    // TODO: Implement
+    int index = 0;
+    MathUtils::Vec3 newLocation(1.0f, 2.0f, 3.0f);
+
+    EXPECT_CALL(*s_instancedRasterizerMock, updateModelMatrices(::testing::_)).Times(1);
+
+    // FUT
+    s_instancedObjectTestable->updateInstancedObject(index, newLocation);
+
+    std::array<float, MathUtils::MAT4_SIZE> modelMatrix = s_instancedObjectTestable->getModelMatrices().at(0);
+
+    EXPECT_EQ(modelMatrix.at(12), newLocation.x);
+    EXPECT_EQ(modelMatrix.at(13), newLocation.y);
+    EXPECT_EQ(modelMatrix.at(14), newLocation.z);
+}
+
 
 // ===============================================================
 // NonInstancedObjectsTestable
 // ===============================================================
 class NonInstancedObjectsTestable : public NonInstancedObject {
 public:
-    NonInstancedObjectsTestable(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocation objectLocation)
+    NonInstancedObjectsTestable(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocationOrientation objectLocation)
         : NonInstancedObject(shaderPtr, rasterizer, objectLocation) {}
 
     // ===============================================================
@@ -324,7 +344,7 @@ public:
     std::shared_ptr<Shader> getShader() { return m_shader; }
     unsigned int getVAO() { return m_VAO; }
     std::shared_ptr<NonInstancedRasterizer> getRasterizer() { return m_rasterizer; }
-    ObjectLocation getObjectLocation() { return m_objectLocation; }
+    ObjectLocationOrientation getObjectLocationOrientation() { return m_objectLocation; }
     void setTransformObject(const std::shared_ptr<Transform> transform) { NonInstancedObject::setTransform(transform); }
 
 };
@@ -334,7 +354,7 @@ class NonInstancedObjectTest : public OpenGLTestFixture
 {
 public:
     static std::shared_ptr<NonInstancedRasterizerMock> s_nonInstancedRasterizerMock;
-    static std::shared_ptr<ObjectLocation> s_objectLocation;
+    static std::shared_ptr<ObjectLocationOrientation> s_objectLocation;
     static std::shared_ptr<TransformMock> s_transformMock;
     static ::testing::StrictMock<NonInstancedObjectsTestable>* s_nonInstancedObjectTestable;
 
@@ -346,7 +366,7 @@ protected:
         VertexData vertexProperties{ { 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f }, 3 };
         RenderObjectTest::s_shaderMock = std::make_shared<ShaderMock>("ztest_valid_shader.vert", "ztest_valid_shader.frag", "ztest_valid_shader.geom");
         s_nonInstancedRasterizerMock = std::make_shared<NonInstancedRasterizerMock>(vertexProperties);
-        s_objectLocation = std::make_shared<ObjectLocation>(MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f);
+        s_objectLocation = std::make_shared<ObjectLocationOrientation>(MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f);
         s_transformMock = std::make_shared<TransformMock>();
 
         EXPECT_CALL(*s_nonInstancedRasterizerMock, createNewVAO()).Times(1);
@@ -369,7 +389,7 @@ protected:
 };
 
 std::shared_ptr<NonInstancedRasterizerMock> NonInstancedObjectTest::s_nonInstancedRasterizerMock = nullptr;
-std::shared_ptr<ObjectLocation> NonInstancedObjectTest::s_objectLocation;
+std::shared_ptr<ObjectLocationOrientation> NonInstancedObjectTest::s_objectLocation;
 std::shared_ptr<TransformMock> NonInstancedObjectTest::s_transformMock;
 ::testing::StrictMock<NonInstancedObjectsTestable>* NonInstancedObjectTest::s_nonInstancedObjectTestable = nullptr;
 
@@ -497,7 +517,7 @@ TEST_F(GeometricInstancedObjectTest, RemoveGeometricInstancedObjectCorrectlyDele
 // ===============================================================
 class GeometricNonInstancedObjectsTestable : public GeometricNonInstancedObject {
 public:
-    GeometricNonInstancedObjectsTestable(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocation objectLocation, ObjectMaterialProperties objectMaterialProperties)
+    GeometricNonInstancedObjectsTestable(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocationOrientation objectLocation, ObjectMaterialProperties objectMaterialProperties)
         : GeometricNonInstancedObject(shaderPtr, rasterizer, objectLocation, objectMaterialProperties) {}
 
     // ===============================================================
@@ -506,7 +526,7 @@ public:
     std::shared_ptr<Shader> getShader() { return m_shader; }
     unsigned int getVAO() { return m_VAO; }
     std::shared_ptr<NonInstancedRasterizer> getRasterizer() { return m_rasterizer; }
-    ObjectLocation getObjectLocation() { return m_objectLocation; }
+    ObjectLocationOrientation getObjectLocationOrientation() { return m_objectLocation; }
     void setTransformObject(const std::shared_ptr<Transform> transform) { NonInstancedObject::setTransform(transform); }
     ObjectMaterialProperties getObjectMaterialProperties() { return m_objectMaterialProperties; }
 
@@ -526,7 +546,7 @@ protected:
         VertexData vertexProperties{ { 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f }, 3 };
         RenderObjectTest::s_shaderMock = std::make_shared<ShaderMock>("ztest_valid_shader.vert", "ztest_valid_shader.frag", "ztest_valid_shader.geom");
         NonInstancedObjectTest::s_nonInstancedRasterizerMock = std::make_shared<NonInstancedRasterizerMock>(vertexProperties);
-        NonInstancedObjectTest::s_objectLocation = std::make_shared<ObjectLocation>(MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f);
+        NonInstancedObjectTest::s_objectLocation = std::make_shared<ObjectLocationOrientation>(MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f);
         NonInstancedObjectTest::s_transformMock = std::make_shared<TransformMock>();
         GeometricInstancedObjectTest::s_objectMaterialProperties = std::make_shared<ObjectMaterialProperties>(32.0f, 0, 1);
 

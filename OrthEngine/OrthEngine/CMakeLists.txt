@@ -9,6 +9,7 @@ set(glfw3_DIR "C:\\Externals\\lib\\cmake\\glfw3")
 set(assimp_DIR "C:\\Externals\\lib\\cmake\\assimp")
 set(FREETYPE_INCLUDE_DIRS "C:\\Externals\\include\\freetype")
 set(g3log_DIR "C:\\Externals\\lib\\cmake\\g3log")
+set(Bullet_DIR "C:\\workspace\\Externals\\vcpkg\\packages\\bullet3_x64-windows\\share\\bullet")
 
 # Set C++ version to 17
 set(CMAKE_CXX_STANDARD 17)
@@ -57,19 +58,26 @@ find_package(g3log REQUIRED)
 # Add the include directories for g3log
 include_directories(${G3LOG_INCLUDE_DIRS})
 
+# ===== Bullet Physics Config =====
+find_package(Bullet CONFIG REQUIRED)
+
 # Link against all required libraries
 target_link_libraries(${PROJECT} PRIVATE
 	Camera
 	EngineApp
 	MathUtils
+    RigidBody
+    PhysicsWorld
 	Window
     ${G3LOG_LIBRARIES}
+    ${BULLET_LIBRARIES}
 )
 
 # Add subdirectories
 add_subdirectory(Application)
 add_subdirectory(Externals)
 add_subdirectory(Data)
+add_subdirectory(Physics)
 add_subdirectory(Renderer)
 add_subdirectory(Resources)
 add_subdirectory(Utils)

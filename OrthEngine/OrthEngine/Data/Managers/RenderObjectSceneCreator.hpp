@@ -9,6 +9,7 @@
 
 #include "Factories/FactoryStructs.hpp"
 #include "Transform/Transform.hpp"
+#include "ObjectStructs.hpp"
 
 enum class PlaneDimension
 {
@@ -40,7 +41,7 @@ public:
     RenderObjectSceneCreator();
     ~RenderObjectSceneCreator();
 
-    virtual std::vector<RenderObjectConfig> createExperimentalScene();
+    virtual std::vector<ObjectConfig> createExperimentalScene();
     virtual void drawInstancedPlane(const PlaneDimension& planeDimension, const AxisPlaneDrawInfo& axisPlaneDrawInfo, std::vector< std::array<float, MathUtils::MAT4_SIZE>>& modelMatVec, std::vector<float>& textureIDsVec);
 
 private:

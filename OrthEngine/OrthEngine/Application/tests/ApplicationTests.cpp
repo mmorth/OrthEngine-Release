@@ -11,7 +11,9 @@
 #include "Publisher.hpp"
 #include "PublisherMock.hpp"
 
+#include "Managers/Collision/PhysicsManager.hpp"
 #include "Managers/RenderObjectManager.hpp"
+#include "Managers/RenderObjectSceneCreator.hpp"
 #include "Managers/tests/ManagerMock.hpp"
 
 #include "Window/Window.hpp"
@@ -36,6 +38,7 @@ public:
     std::shared_ptr<Camera> getCamera() { return m_camera; }
     float getDeltaTime() { return m_deltaTime; }
     float getLastFrame() { return m_lastFrame; }
+    unsigned int getCurID() { return m_curID; }
 
     void computeFps(std::chrono::time_point<std::chrono::high_resolution_clock>& start, unsigned int& frames) { return EngineApp::calculateFps(start, frames); }
 
@@ -51,7 +54,9 @@ class EngineAppTest : public OpenGLTestFixture
 public:
     static std::shared_ptr<WindowMock> s_windowMock;
     static std::shared_ptr<RenderObjectManagerMock> s_renderObjectManagerMock;
+    static std::shared_ptr<PhysicsManagerMock> s_physicsManagerMock;
     static std::shared_ptr<CameraMock> s_cameraMock;
+    static std::shared_ptr<RenderObjectSceneCreator> s_renderObjectSceneCreator;
     static ::testing::StrictMock<EngineAppTestable>* s_engineAppTestable;
 
 protected:
@@ -60,17 +65,21 @@ protected:
         OpenGLTestFixture::SetUpTestCase();
         s_windowMock = std::make_shared<WindowMock>();
         s_renderObjectManagerMock = std::make_shared<RenderObjectManagerMock>();
+        s_physicsManagerMock = std::make_shared<PhysicsManagerMock>();
         s_cameraMock = std::make_shared<CameraMock>();
+        s_renderObjectSceneCreator = std::make_shared<RenderObjectSceneCreator>();
 
         s_engineAppTestable = new ::testing::StrictMock<EngineAppTestable>();
-        s_engineAppTestable->initialize(s_windowMock, s_renderObjectManagerMock, s_cameraMock);
+        s_engineAppTestable->initialize(s_windowMock, s_renderObjectManagerMock, s_physicsManagerMock, s_cameraMock, s_renderObjectSceneCreator);
     }
 
     static void TearDownTestCase()
     {
         s_windowMock.reset();
         s_renderObjectManagerMock.reset();
+        s_physicsManagerMock.reset();
         s_cameraMock.reset();
+        s_renderObjectSceneCreator.reset();
         delete s_engineAppTestable;
 
         OpenGLTestFixture::TearDownTestCase();
@@ -80,7 +89,9 @@ protected:
 
 std::shared_ptr<WindowMock> EngineAppTest::s_windowMock;
 std::shared_ptr<RenderObjectManagerMock> EngineAppTest::s_renderObjectManagerMock;
+std::shared_ptr<PhysicsManagerMock> EngineAppTest::s_physicsManagerMock;
 std::shared_ptr<CameraMock> EngineAppTest::s_cameraMock;
+std::shared_ptr<RenderObjectSceneCreator> EngineAppTest::s_renderObjectSceneCreator;
 ::testing::StrictMock<EngineAppTestable>* EngineAppTest::s_engineAppTestable;
 
 // ------------------------------------------------------------------------
@@ -110,6 +121,26 @@ TEST_F(EngineAppTest, CreateEngineAppCorrectlySetsDefaultValuesAndPublishers)
 }
 
 // ------------------------------------------------------------------------
+TEST_F(EngineAppTest, LoadSceneInitializesRenderObjectManagerAndCreatesRenderAndRigidBodyObjects)
+{
+    // Setup new objects
+    unsigned int startingID = s_engineAppTestable->getCurID();
+    std::vector<ObjectConfig> objectConfigs;
+    ObjectConfig objectConfig1; objectConfig1.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false, true };
+    ObjectConfig objectConfig2; objectConfig2.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false, false };
+    objectConfigs.push_back(objectConfig1); objectConfigs.push_back(objectConfig2);
+
+    EXPECT_CALL(*s_renderObjectManagerMock, initialize(::testing::_, ::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*s_renderObjectManagerMock, createRenderObject(::testing::_, ::testing::_)).Times(2);
+    EXPECT_CALL(*s_physicsManagerMock, createRigidBody(::testing::_, ::testing::_, ::testing::_)).Times(1);
+
+    // FUT
+    s_engineAppTestable->loadScene(objectConfigs);
+
+    EXPECT_EQ(s_engineAppTestable->getCurID(), startingID + objectConfigs.size());
+}
+
+// ------------------------------------------------------------------------
 TEST_F(EngineAppTest, RunEngineAppCallsCorrectMocks)
 {
     // ake the main render loop only run once
@@ -122,10 +153,19 @@ TEST_F(EngineAppTest, RunEngineAppCallsCorrectMocks)
     EXPECT_CALL(*s_windowMock, processInput()).Times(1);
     EXPECT_CALL(*s_cameraMock, ProcessKeyboard(::testing::_, ::testing::_)).Times(1);
     EXPECT_CALL(*s_windowMock, getWindowSize(::testing::_, ::testing::_)).Times(1);
-    EXPECT_CALL(*s_cameraMock, GetPosition()).Times(1);
-    EXPECT_CALL(*s_cameraMock, GetFront()).Times(1);
-    EXPECT_CALL(*s_renderObjectManagerMock, renderAll(::testing::_, ::testing::_)).Times(1);
+
+    EXPECT_CALL(*s_cameraMock, GetPosition()).Times(2);
+    EXPECT_CALL(*s_cameraMock, GetFront()).Times(2);
+    EXPECT_CALL(*s_physicsManagerMock, updatePlayerLocation(::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*s_physicsManagerMock, stepSimulationAndCheckCollision(::testing::_)).Times(1);
+    EXPECT_CALL(*s_physicsManagerMock, getPlayerLocation()).Times(1);
+    EXPECT_CALL(*s_cameraMock, SetTarget(::testing::_)).Times(1);
+    EXPECT_CALL(*s_cameraMock, GetFrontVector()).Times(2);
+    EXPECT_CALL(*s_physicsManagerMock, detectCameraCollision(::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*s_cameraMock, SetPosition(::testing::_)).Times(1);
     EXPECT_CALL(*s_renderObjectManagerMock, getTransformationMatrices(::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*s_renderObjectManagerMock, renderAll(::testing::_, ::testing::_)).Times(1);
+    
     EXPECT_CALL(*s_windowMock, swapBuffers()).Times(1);
     EXPECT_CALL(*s_windowMock, pollEvents()).Times(1);
     EXPECT_CALL(*s_engineAppTestable, getCurrentTime()).Times(1)

@@ -11,6 +11,8 @@
 
 #include "OpenGLFixture.hpp"
 
+#include "RigidBodyFactory.hpp"
+
 #include "RasterizerFactory.hpp"
 #include "Rasterizers/tests/RasterizerMock.hpp"
 #include "RenderObjectFactory.hpp"
@@ -497,7 +499,7 @@ protected:
         OpenGLTestFixture::TearDownTestCase();
     }
 
-    std::unique_ptr<RenderObject> verifyRenderObject(RenderObjectConfig renderObjectConfig)
+    std::unique_ptr<RenderObject> verifyRenderObject(ObjectConfig renderObjectConfig)
     {
         std::optional<std::unique_ptr<RenderObject>> renderObjectOpt = RenderObjectFactory::getInstance().createRenderObject(renderObjectConfig);
         EXPECT_TRUE(renderObjectOpt.has_value()); 
@@ -515,7 +517,7 @@ std::shared_ptr<TextureFactoryMock> RenderObjectFactoryTest::s_textureFactoryMoc
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedCube)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_CUBE, false };
     renderObjectConfig.objectMaterialNames = { 32.0f, "Instanced_Texture_Array", "container2_specular.PNG" };
 
@@ -542,9 +544,9 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedCube)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateNonInstancedCube)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false };
-    renderObjectConfig.objectLocation = { MathUtils::Vec3{-1.0f, -1.0f, -1.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, 0.0f };
+    renderObjectConfig.objectLocationOrientation = { MathUtils::Vec3{-1.0f, -1.0f, -1.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, 0.0f };
     renderObjectConfig.objectMaterialNames = { 32.0f, "container2_resized.PNG", "container2_specular.PNG" };
 
     // Expect Calls
@@ -570,7 +572,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateNonInstancedCube)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateSkybox)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::SKYBOX, false };
 
     // Expect Calls
@@ -593,7 +595,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateSkybox)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateText)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::TEXT, false };
     renderObjectConfig.textProperties = { "Sample Text", {50.0f, 50.0f}, 2.0f, {1.0f, 1.0f, 1.0f} };
 
@@ -614,7 +616,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateText)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedPointLight)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_POINT_LIGHT, false };
     renderObjectConfig.objectMaterialNames = { 32.0f, "Instanced_Texture_Array", "container2_specular.PNG" };
     renderObjectConfig.phongLightProperties = { {0.5f, 0.5f, 0.5f}, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f } };
@@ -646,7 +648,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedPointLight)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedSpotLight)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_SPOT_LIGHT, false };
     renderObjectConfig.lightProperties = { MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 0.0f, 0.0f, 0.0f } };
     renderObjectConfig.phongLightProperties = { {0.0f, 0.0f, 0.0f}, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } };
@@ -670,7 +672,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedSpotLight)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedDirectionalLight)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::DIRECTIONAL_LIGHT, false };
     renderObjectConfig.lightProperties = { MathUtils::Vec3{ 0.0f, -1.0f, 0.0f }, MathUtils::Vec3{ 0.0f, -1.0f, 0.0f } };
     renderObjectConfig.phongLightProperties = { { 0.05f, 0.05f, 0.05f }, { 0.4f, 0.4f, 0.4f }, { 0.5f, 0.5f, 0.5f } };
@@ -692,7 +694,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateInstancedDirectionalLig
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreatePlane)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_PLANE, false };
 
     std::optional<std::unique_ptr<RenderObject>> renderObjectOpt = RenderObjectFactory::getInstance().createRenderObject(renderObjectConfig);
@@ -703,7 +705,7 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreatePlane)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateQuad)
 {
     // Create RenderObject
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::QUAD, false };
 
     std::optional<std::unique_ptr<RenderObject>> renderObjectOpt = RenderObjectFactory::getInstance().createRenderObject(renderObjectConfig);
@@ -714,4 +716,39 @@ TEST_F(RenderObjectFactoryTest, RenderObjectFactoryCreateQuad)
 TEST_F(RenderObjectFactoryTest, RenderObjectFactoryReturnsTheSameInstancedEachTime)
 {
     EXPECT_EQ(&RenderObjectFactory::getInstance(), &RenderObjectFactory::getInstance());
+}
+
+
+
+
+
+// ===============================================================
+// RigidBodyFactoryTest
+// ===============================================================
+class RigidBodyFactoryTest : public ::testing::Test
+{
+
+};
+
+// ------------------------------------------------------------------------
+TEST_F(RigidBodyFactoryTest, RigidBodyFactoryCorrectlyCreatesRigidBodyObjects)
+{
+    ObjectConfig objectConfig;
+    objectConfig.objectLocationOrientation = { MathUtils::Vec3(0.0f, 0.0f, 0.0f), MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
+    objectConfig.physicsShapeInfo = { ShapeType::Box, { 1.0f, 1.0f } };
+
+    // FUT
+    std::optional<std::unique_ptr<RigidBody>> rigidBodyOpt = RigidBodyFactory::getInstance().createRigidBody(objectConfig);
+    EXPECT_TRUE(rigidBodyOpt.has_value());
+
+    std::unique_ptr<RigidBody> rigidBody = std::move(rigidBodyOpt.value());
+    EXPECT_EQ(rigidBody->getBtRigidBody()->getMass(), objectConfig.physicsShapeInfo.physicsProperties.mass);
+    EXPECT_EQ(rigidBody->getBtRigidBody()->getFriction(), objectConfig.physicsShapeInfo.physicsProperties.friction);
+    EXPECT_EQ(rigidBody->getPosition(), objectConfig.objectLocationOrientation.position);
+
+    // Confirm box shape and half extents
+    btCollisionShape* collisionShape = rigidBody->getBtRigidBody()->getCollisionShape();
+    EXPECT_EQ(collisionShape->getShapeType(), BOX_SHAPE_PROXYTYPE);
+    btVector3 shape = collisionShape->getLocalScaling();
+    EXPECT_EQ(collisionShape->getLocalScaling(), BtConversions::mathToBtVec3(objectConfig.objectLocationOrientation.scale));
 }

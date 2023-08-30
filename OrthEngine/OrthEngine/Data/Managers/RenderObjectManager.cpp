@@ -9,7 +9,6 @@ RenderObjectManager::RenderObjectManager()
 	, m_framebuffer(m_framebufferFactory->getFramebuffer())
 	, m_skyboxObject()
 	, m_renderObjects()
-	, m_curID(RESERVED_IDS+1)
 	, m_fpsTextID(1)
 	, m_playerIDs()
 	, m_testFramebufferContents()
@@ -39,42 +38,32 @@ void RenderObjectManager::initialize(const std::shared_ptr<FramebufferFactory> f
 	}
 
 	// Create reserved objects for tracking within manager
-	RenderObjectConfig fpsTextConfig;
+	ObjectConfig fpsTextConfig;
 	fpsTextConfig.renderObjectProperties = { GeometryTypes::TEXT, false };
 	fpsTextConfig.textProperties = { "", {10.0f, 775.0f}, 0.5f, {1.0f, 1.0f, 1.0f} };
 	m_renderObjects.emplace(m_fpsTextID, m_renderObjectFactory->createRenderObject(fpsTextConfig).value());
 
 	LOG(INFO) << "FPS object created";
-
-	loadScene(m_renderObjectSceneCreator->createExperimentalScene());
-
-	LOG(INFO) << "Experimental scene loaded";
 }
 
 // ------------------------------------------------------------------------
-void RenderObjectManager::loadScene(const std::vector<RenderObjectConfig>& renderObjectConfigs)
-{
-	// Create all the objets specified by the scene
-	for (RenderObjectConfig renderObjectConfig : renderObjectConfigs)
-		createRenderObject(renderObjectConfig);
-}
-
-// ------------------------------------------------------------------------
-void RenderObjectManager::createRenderObject(const RenderObjectConfig& renderObjectConfig)
+RenderObject* RenderObjectManager::createRenderObject(const unsigned int curID, const ObjectConfig& renderObjectConfig)
 {
 	// Attempt to create object and obtain value if exists
 	std::optional<std::unique_ptr<RenderObject>> renderObjectOpt = m_renderObjectFactory->createRenderObject(renderObjectConfig);
 	if (!renderObjectOpt.has_value())
-		return;
+		return nullptr;
 
+	// Create render object pointer
 	std::unique_ptr<RenderObject> renderObjectPtr = std::move(renderObjectOpt.value());
+	RenderObject* renderObjectRet = renderObjectPtr.get();
 
 	// Check if Skybox object, if so, store the shared_ptr in m_skyboxObject
 	if (auto skyboxObj = dynamic_cast<SkyboxObject*>(renderObjectPtr.get()))
 	{
 		LOG(INFO) << "SkyboxObject updated";
 		m_skyboxObject = std::make_unique<SkyboxObject>(*skyboxObj);
-		return;
+		return renderObjectRet;
 	}
 
 	// Create instanced objects if exists
@@ -94,15 +83,15 @@ void RenderObjectManager::createRenderObject(const RenderObjectConfig& renderObj
 	}
 
 	// Store the resulting object in the RenderObject list
-	m_renderObjects.emplace(m_curID, std::move(renderObjectPtr));
-	LOG(INFO) << "New object added " << m_curID;
-
+	m_renderObjects.emplace(curID, std::move(renderObjectPtr));
+	LOG(INFO) << "New object added " << curID;
+	 
+	// TODO: The player will now always get rendered either invisibility for first-person or a specified offset from the camera for third-person
 	// Track as player if current object is a player
 	if (renderObjectConfig.renderObjectProperties.isPlayer)
-		m_playerIDs.insert(m_curID);
+		m_playerIDs.push_back(curID);
 
-	// Increment unique RenderObject ID
-	m_curID++;
+	return renderObjectRet;
 }
 
 // ------------------------------------------------------------------------
@@ -121,7 +110,7 @@ void RenderObjectManager::updateFpsText(const std::string& newFpsString)
 }
 
 // ------------------------------------------------------------------------
-bool RenderObjectManager::updateRenderObject(const RenderObjectProperties& renderObjectProperties, const RenderObjectConfig& renderObjectConfig)
+bool RenderObjectManager::updateRenderObject(const RenderObjectProperties& renderObjectProperties, const ObjectConfig& renderObjectConfig)
 {
 	// TODO: Implement this function once you determine what the EngineApp workflow will look like
 
@@ -229,7 +218,7 @@ void RenderObjectManager::renderAll(TransformationMatrices& transformationMatric
 			spotlightObject->updatePosition(renderLoopConfigOptions.lightProperties);
 
 		// Update player object location to move with the camera
-		auto it = m_playerIDs.find(pair.first);
+		auto it = std::find(m_playerIDs.begin(), m_playerIDs.end(), pair.first);
 		if (it != m_playerIDs.end())
 			dynamic_cast<NonInstancedObject*>(pair.second.get())->updateLocation(transformationMatrices.camPosition);
 

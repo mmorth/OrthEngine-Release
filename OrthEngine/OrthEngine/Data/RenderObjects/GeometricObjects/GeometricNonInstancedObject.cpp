@@ -1,7 +1,7 @@
 #include "GeometricNonInstancedObject.hpp"
 
 // ------------------------------------------------------------------------
-GeometricNonInstancedObject::GeometricNonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties)
+GeometricNonInstancedObject::GeometricNonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocationOrientation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties)
 	: NonInstancedObject(shaderPtr, rasterizer, objectLocation)
 	, m_objectMaterialProperties(objectMaterialProperties)
 {

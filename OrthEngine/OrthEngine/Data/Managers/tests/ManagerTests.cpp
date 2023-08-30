@@ -11,6 +11,9 @@
 
 #include "OpenGLFixture.hpp"
 
+#include "PhysicsWorldMock.hpp"
+#include "RigidBodyFactory.hpp"
+
 #include "RasterizerFactory.hpp"
 #include "Rasterizers/tests/RasterizerMock.hpp"
 #include "RenderObjectFactory.hpp"
@@ -27,9 +30,22 @@
 
 #include "FactoryMock.hpp"
 
+#include "Collision/PhysicsManager.hpp"
 #include "RenderObjectManager.hpp"
 #include "RenderObjectSceneCreator.hpp"
 #include "ManagerMock.hpp"
+
+namespace
+{
+    // ------------------------------------------------------------------------
+    std::array<float, MathUtils::MAT4_SIZE> IDENTITY_MATRIX
+    {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+};
 
 // ===============================================================
 // RenderObjectManagerTestable
@@ -58,10 +74,9 @@ public:
     }
 
     const std::unordered_map<int, std::unique_ptr<RenderObject>>& getRenderObjects() const { return m_renderObjects; }
-    const std::unordered_set<unsigned int>& getPlayerIDs() const { return m_playerIDs; }
+    const std::vector<unsigned int> getPlayerIDs() const { return m_playerIDs; }
 
     unsigned int getFPSTextID() const { return m_fpsTextID; }
-    unsigned int getCurrentID() const { return m_curID; }
 
     static unsigned int getReservedIDs() { return RESERVED_IDS; }
 
@@ -82,6 +97,7 @@ public:
     static std::shared_ptr<ShaderFactoryMock> s_shaderFactoryMock;
     static std::shared_ptr<RenderObjectSceneCreatorMock> s_renderObjectSceneCreatorMock;
     static ::testing::StrictMock<RenderObjectManagerTestable>* s_renderObjectManagerTestable;
+    static int curID;
 
 protected:
     static void SetUpTestCase()
@@ -92,6 +108,7 @@ protected:
         s_shaderFactoryMock = std::make_shared<ShaderFactoryMock>();
         s_renderObjectSceneCreatorMock = std::make_shared<RenderObjectSceneCreatorMock>();
         s_renderObjectManagerTestable = new ::testing::StrictMock<RenderObjectManagerTestable>();
+        curID = 2;
     }
 
     static void TearDownTestCase()
@@ -111,6 +128,7 @@ std::shared_ptr<FramebufferFactoryMock> RenderObjectManagerTest::s_framebufferFa
 std::shared_ptr<ShaderFactoryMock> RenderObjectManagerTest::s_shaderFactoryMock = nullptr;
 std::shared_ptr<RenderObjectSceneCreatorMock> RenderObjectManagerTest::s_renderObjectSceneCreatorMock = nullptr;
 ::testing::StrictMock<RenderObjectManagerTestable>* RenderObjectManagerTest::s_renderObjectManagerTestable = nullptr;
+int RenderObjectManagerTest::curID = 0;
 
 // ------------------------------------------------------------------------
 TEST_F(RenderObjectManagerTest, RenderObjectManagerCorrectInitializesMemberVariables)
@@ -119,11 +137,6 @@ TEST_F(RenderObjectManagerTest, RenderObjectManagerCorrectInitializesMemberVaria
     EXPECT_CALL(*s_renderObjectFactoryMock, createRenderObject(::testing::_))
         .Times(1)
         .WillOnce(::testing::Return(std::optional<std::unique_ptr<TextObjectMock>>(std::make_unique<TextObjectMock>(std::make_shared<Shader>("ztest_valid_shader.vert", "ztest_valid_shader.frag", "ztest_valid_shader.geom"), std::make_shared<TextRasterizer>(VertexData({ 1.0f }, 1)), TextProperties()))));
-
-    // Verify experimental scene is loaded
-    EXPECT_CALL(*s_renderObjectSceneCreatorMock, createExperimentalScene())
-        .Times(1)
-        .WillOnce(::testing::Return(std::vector<RenderObjectConfig>{}));
 
     // Set Framebuffer to Framebuffer mock
     EXPECT_CALL(*s_framebufferFactoryMock, getFramebuffer()).Times(1)
@@ -137,22 +150,6 @@ TEST_F(RenderObjectManagerTest, RenderObjectManagerCorrectInitializesMemberVaria
     EXPECT_EQ(1, s_renderObjectManagerTestable->getRenderObjects().size());
     EXPECT_EQ(1, s_renderObjectManagerTestable->getFPSTextID());
     EXPECT_EQ(0, s_renderObjectManagerTestable->getPlayerIDs().size());
-    EXPECT_EQ(2, s_renderObjectManagerTestable->getCurrentID());
-}
-
-// ------------------------------------------------------------------------
-TEST_F(RenderObjectManagerTest, LoadSceneCreatesRenderObjectsForAllConfigs)
-{
-    // Create three dummy render object configs to load
-    std::vector<RenderObjectConfig> renderObjectConfigs{ {}, {}, {} };
-
-    // CreateRenderObject should get called 3 times
-    std::optional<std::unique_ptr<RenderObject>> nullOptRenderObj{ std::nullopt };
-    EXPECT_CALL(*s_renderObjectFactoryMock, createRenderObject(::testing::_)).Times(3)
-        .WillOnce(::testing::Return(std::nullopt)).WillOnce(::testing::Return(std::nullopt)).WillOnce(::testing::Return(std::nullopt));
-
-    // FUT
-    s_renderObjectManagerTestable->loadScene(renderObjectConfigs);
 }
 
 // ------------------------------------------------------------------------
@@ -161,7 +158,7 @@ TEST_F(RenderObjectManagerTest, CreateSkyboxRenderObjectCorrectlySetsSkyboxObjec
     size_t startNumRenderObjects = s_renderObjectManagerTestable->getRenderObjects().size();
 
     // Create three dummy render object configs to load
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::SKYBOX, false };
 
     // Verify function calls
@@ -169,7 +166,7 @@ TEST_F(RenderObjectManagerTest, CreateSkyboxRenderObjectCorrectlySetsSkyboxObjec
         .WillOnce(::testing::Return(std::optional<std::unique_ptr<SkyboxObjectMock>>(std::make_unique<SkyboxObjectMock>(std::make_shared<Shader>("ztest_valid_shader.vert", "ztest_valid_shader.frag", "ztest_valid_shader.geom"), std::make_shared<SkyboxRasterizer>(VertexData({ 1.0f }, 1)), 1))));
 
     // FUT
-    s_renderObjectManagerTestable->createRenderObject(renderObjectConfig);
+    s_renderObjectManagerTestable->createRenderObject(curID++, renderObjectConfig);
 
     EXPECT_TRUE(s_renderObjectManagerTestable->getSkyboxObject() != nullptr);
     EXPECT_EQ(startNumRenderObjects, s_renderObjectManagerTestable->getRenderObjects().size());
@@ -179,10 +176,10 @@ TEST_F(RenderObjectManagerTest, CreateSkyboxRenderObjectCorrectlySetsSkyboxObjec
 TEST_F(RenderObjectManagerTest, CreateInstancedObjectCorrectlyAddsInstancedObject)
 {
     size_t startNumRenderObjects = s_renderObjectManagerTestable->getRenderObjects().size();
-    s_renderObjectManagerTestable->instancedObjectID = s_renderObjectManagerTestable->getCurrentID();
+    s_renderObjectManagerTestable->instancedObjectID = curID;
 
     // Create three dummy render object configs to load
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_CUBE, false };
     renderObjectConfig.instancedObjectProperties.modelMat = { {1.0f}, {2.0f} };
     renderObjectConfig.instancedObjectProperties.textureIDs = { 1.0f, 2.0f };
@@ -207,7 +204,7 @@ TEST_F(RenderObjectManagerTest, CreateInstancedObjectCorrectlyAddsInstancedObjec
     EXPECT_CALL(*instMockPtr, addInstancedObject(::testing::_, ::testing::_)).Times(2);
 
     // FUT
-    s_renderObjectManagerTestable->createRenderObject(renderObjectConfig);
+    s_renderObjectManagerTestable->createRenderObject(curID++, renderObjectConfig);
 
     EXPECT_EQ(startNumRenderObjects + 1, s_renderObjectManagerTestable->getRenderObjects().size());
 }
@@ -218,7 +215,7 @@ TEST_F(RenderObjectManagerTest, CreatePointLightProperlyUpdatesLightProperties)
     size_t startNumRenderObjects = s_renderObjectManagerTestable->getRenderObjects().size();
 
     // Create three dummy render object configs to load
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_POINT_LIGHT, false };
     renderObjectConfig.objectMaterialNames = { 32.0f, "Instanced_Texture_Array", "container2_specular.PNG" };
     renderObjectConfig.phongLightProperties = { {0.5f, 0.5f, 0.5f}, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f } };
@@ -245,7 +242,7 @@ TEST_F(RenderObjectManagerTest, CreatePointLightProperlyUpdatesLightProperties)
     EXPECT_CALL(*instMockPtr, updateLightProperties()).Times(1);
 
     // FUT
-    s_renderObjectManagerTestable->createRenderObject(renderObjectConfig);
+    s_renderObjectManagerTestable->createRenderObject(curID++, renderObjectConfig);
 
     EXPECT_EQ(startNumRenderObjects + 1, s_renderObjectManagerTestable->getRenderObjects().size());
 }
@@ -257,9 +254,9 @@ TEST_F(RenderObjectManagerTest, CreatePlayerObjectCorrectlyTracksPlayerObjectID)
     size_t startPlayerIDSize = s_renderObjectManagerTestable->getPlayerIDs().size();
 
     // Create three dummy render object configs to load
-    RenderObjectConfig renderObjectConfig;
+    ObjectConfig renderObjectConfig;
     renderObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, true };
-    renderObjectConfig.objectLocation = { MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
+    renderObjectConfig.objectLocationOrientation = { MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
     renderObjectConfig.objectMaterialNames = { 32.0f, "container2_resized.PNG", "container2_specular.PNG" };
 
     // Verify function calls
@@ -269,7 +266,7 @@ TEST_F(RenderObjectManagerTest, CreatePlayerObjectCorrectlyTracksPlayerObjectID)
             std::make_shared<NonInstancedRasterizer>(
                 VertexData({ 1.0f }, 1)
                 ),
-            ObjectLocation()
+            ObjectLocationOrientation()
             )
         );
 
@@ -277,7 +274,7 @@ TEST_F(RenderObjectManagerTest, CreatePlayerObjectCorrectlyTracksPlayerObjectID)
         .WillOnce(::testing::Return(::testing::ByMove(std::move(renderObjectMockOpt))));
 
     // FUT
-    s_renderObjectManagerTestable->createRenderObject(renderObjectConfig);
+    s_renderObjectManagerTestable->createRenderObject(curID++, renderObjectConfig);
 
     EXPECT_EQ(startNumRenderObjects + 1, s_renderObjectManagerTestable->getRenderObjects().size());
     EXPECT_EQ(startPlayerIDSize + 1, s_renderObjectManagerTestable->getPlayerIDs().size());
@@ -382,7 +379,7 @@ TEST_F(RenderObjectManagerTest, RenderAllNoSetupAndTeardown)
     EXPECT_CALL(*skyboxObjMock, render(::testing::_, ::testing::_)).Times(1);
 
     // Verify all RenderObjects are rendered
-    for (unsigned int i = 0; i < s_renderObjectManagerTestable->getCurrentID(); i++)
+    for (unsigned int i = 0; i < curID; i++)
     {
         auto it = s_renderObjectManagerTestable->getRenderObjects().find(i);
         if (it != s_renderObjectManagerTestable->getRenderObjects().end())
@@ -438,7 +435,7 @@ TEST_F(RenderObjectManagerTest, RenderAllWithSetupAndTeardown)
         .WillOnce(::testing::Return(std::make_shared<Shader>("ztest_valid_shader.vert", "ztest_valid_shader.frag", "ztest_valid_shader.geom")));
 
     // Verify all RenderObjects are rendered
-    for (unsigned int i = 0; i < s_renderObjectManagerTestable->getCurrentID(); i++)
+    for (unsigned int i = 0; i < curID; i++)
     {
         auto it = s_renderObjectManagerTestable->getRenderObjects().find(i);
         if (it != s_renderObjectManagerTestable->getRenderObjects().end())
@@ -467,4 +464,145 @@ TEST_F(RenderObjectManagerTest, RenderAllWithSetupAndTeardown)
 
     // FUT 
     s_renderObjectManagerTestable->renderAll(TransformationMatrices(), renderLoopConfigOptions);
+}
+
+
+// ===============================================================
+// PhysicsManagerTestable
+// ===============================================================
+class PhysicsManagerTestable : public PhysicsManager
+{
+public:
+    PhysicsManagerTestable()
+        : PhysicsManager() {}
+
+    // ===============================================================
+    // Protected Accessors
+    // ===============================================================
+    const std::shared_ptr<PhysicsWorld> getPhysicsWorld() const { return m_physicsWorld; }
+    const std::unordered_map<int, std::vector<std::unique_ptr<RigidBody>>>& getRigidBodies() const { return m_rigidBodies; }
+    const int getPlayerID() const { return m_playerID; }
+};
+
+// ===============================================================
+// PhysicsManagerTest
+// ===============================================================
+class PhysicsManagerTest : public OpenGLTestFixture
+{
+public:
+    static std::shared_ptr<PhysicsWorldMock> s_physicsWorldMock;
+    static std::shared_ptr<RigidBodyFactoryMock> s_rigidBodyFactoryMock;
+    static ::testing::StrictMock<PhysicsManagerTestable>* s_physicsManagerTestable;
+
+protected:
+    static void SetUpTestCase()
+    {
+        OpenGLTestFixture::SetUpTestCase();
+        s_physicsWorldMock = std::make_shared<PhysicsWorldMock>();
+        s_rigidBodyFactoryMock = std::make_shared<RigidBodyFactoryMock>();
+        s_physicsManagerTestable = new ::testing::StrictMock<PhysicsManagerTestable>();
+
+        s_physicsManagerTestable->initialize(s_physicsWorldMock, s_rigidBodyFactoryMock);
+    }
+
+    static void TearDownTestCase()
+    {
+        s_physicsWorldMock.reset();
+        s_rigidBodyFactoryMock.reset();
+        delete s_physicsManagerTestable;
+        OpenGLTestFixture::TearDownTestCase();
+    }
+};
+
+std::shared_ptr<PhysicsWorldMock> PhysicsManagerTest::s_physicsWorldMock = nullptr;
+std::shared_ptr<RigidBodyFactoryMock> PhysicsManagerTest::s_rigidBodyFactoryMock = nullptr;
+::testing::StrictMock<PhysicsManagerTestable>* PhysicsManagerTest::s_physicsManagerTestable = nullptr;
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, CreateInstancedRigidBodyCorrectlyCreatesInstanced)
+{
+    ObjectConfig instancedCubeObjectConfig;
+    instancedCubeObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_CUBE, false, true };
+    instancedCubeObjectConfig.instancedObjectProperties.modelMat.push_back(IDENTITY_MATRIX);
+    instancedCubeObjectConfig.instancedObjectProperties.modelMat.push_back(IDENTITY_MATRIX);
+    instancedCubeObjectConfig.instancedObjectProperties.textureIDs.push_back(1.0f);
+    instancedCubeObjectConfig.instancedObjectProperties.textureIDs.push_back(1.0f);
+    int curID = s_physicsManagerTestable->getRigidBodies().size();
+
+    EXPECT_CALL(*s_rigidBodyFactoryMock, createRigidBody(::testing::_)).Times(0);
+    EXPECT_CALL(*s_physicsWorldMock, addRigidBody(::testing::_)).Times(2);
+
+    // FUT
+    s_physicsManagerTestable->createRigidBody(curID, instancedCubeObjectConfig, false);
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, CreateNonInstancedRigidBodyCorrectlyCreatesNonInstanced)
+{
+    ObjectConfig objectConfig;
+    objectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false, true };
+    int curID = s_physicsManagerTestable->getRigidBodies().size();
+
+    EXPECT_CALL(*s_rigidBodyFactoryMock, createRigidBody(::testing::_)).Times(0);
+    EXPECT_CALL(*s_physicsWorldMock, addRigidBody(::testing::_)).Times(1);
+
+    // FUT
+    s_physicsManagerTestable->createRigidBody(curID, objectConfig, false);
+
+    EXPECT_EQ(s_physicsManagerTestable->getRigidBodies().size(), curID + 1);
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, CreatePlayerRigidBodyCorrectlyStoresIDAsPlayer)
+{
+    ObjectConfig objectConfig;
+    int curID = s_physicsManagerTestable->getRigidBodies().size();
+    
+    // FUT
+    s_physicsManagerTestable->createRigidBody(curID, objectConfig, true);
+
+    EXPECT_EQ(s_physicsManagerTestable->getPlayerID(), curID);
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, RemoveRigidBodyCorrectlyRemovesTheRigidBodyAtIndex)
+{
+    int previousRigidObjectSize = s_physicsManagerTestable->getRigidBodies().size();
+
+    s_physicsManagerTestable->removeRigidBodyWithID(1, 0);
+
+    EXPECT_EQ(s_physicsManagerTestable->getRigidBodies().size(), previousRigidObjectSize);
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, UpdateAndGetPlayerLocationCorrectlyHandlesPlayerLocation)
+{
+    MathUtils::Vec3 newPlayerPosition(1.0f, 2.0f, 3.0f);
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, CleanupProperlyRemovesAllRigidBodies)
+{
+    EXPECT_CALL(*s_physicsWorldMock, removeRigidBody(::testing::_)).Times(3);
+
+    // FUT
+    s_physicsManagerTestable->cleanup();
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, DetectCameraCollisionCorrectlyCallsPhysicsWorldDetectCameraCollision)
+{
+    EXPECT_CALL(*s_physicsWorldMock, detectCameraCollision(::testing::_, ::testing::_, ::testing::_)).Times(1);
+
+    // FUT
+    s_physicsManagerTestable->detectCameraCollision(MathUtils::Vec3(0.0f, 0.0f, 0.0f), MathUtils::Vec3(0.0f, 0.0f, 0.0f), MathUtils::Vec3(0.0f, 0.0f, 0.0f));
+}
+
+// ------------------------------------------------------------------------
+TEST_F(PhysicsManagerTest, StepSimulationAndCheckSimulationPerformsBothOperationsOnPhysicsWorld)
+{
+    EXPECT_CALL(*s_physicsWorldMock, stepSimulation(::testing::_, ::testing::_)).Times(1);
+
+    // FUT
+    s_physicsManagerTestable->stepSimulationAndCheckCollision(1.0f);
 }

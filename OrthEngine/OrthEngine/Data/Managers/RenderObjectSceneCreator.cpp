@@ -1,5 +1,15 @@
 #include "RenderObjectSceneCreator.hpp"
 
+namespace
+{
+	std::array<float, MathUtils::MAT3_SIZE> MAT3_IDENTITY_MATRIX
+	{
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
+	};
+}
+
 // ------------------------------------------------------------------------
 RenderObjectSceneCreator::RenderObjectSceneCreator()
 	: m_numInstancedObjects()
@@ -10,18 +20,19 @@ RenderObjectSceneCreator::~RenderObjectSceneCreator()
 {}
 
 // ------------------------------------------------------------------------
-std::vector<RenderObjectConfig> RenderObjectSceneCreator::createExperimentalScene()
+std::vector<ObjectConfig> RenderObjectSceneCreator::createExperimentalScene()
 {
 	// Define a struct list that will return the config of all objects to be created
-	std::vector<RenderObjectConfig> renderObjectConfigList{};
+	std::vector<ObjectConfig> renderObjectConfigList{};
 
-	// TODO: Evenutally the RenderObjectConfig variables will be in the UIApp
+	// TODO: Evenutally the ObjectConfig variables will be in the UIApp
 	// ===== Ground Plane =====
 	// Instanced Cube Objects
 	// Note: All instanced cubes should have the same texture array and just select which textures they want from the array
-	RenderObjectConfig instancedCubeObjectConfig;
-	instancedCubeObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_CUBE, false };
+	ObjectConfig instancedCubeObjectConfig;
+	instancedCubeObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_CUBE, false, true };
 	instancedCubeObjectConfig.objectMaterialNames = { 32.0f, "Instanced_Texture_Array", "container2_specular.PNG" };
+	instancedCubeObjectConfig.physicsShapeInfo = { ShapeType::Box, { 0.0f, 1.0f } };
 
 	// Create bottom plane
 	drawInstancedPlane(PlaneDimension::Y_AXIS, AxisPlaneDrawInfo(MathUtils::Vec2(-5.0f, 5.0f), MathUtils::Vec2(-5.0f, 5.0f), -2.0f), instancedCubeObjectConfig.instancedObjectProperties.modelMat, instancedCubeObjectConfig.instancedObjectProperties.textureIDs);
@@ -37,49 +48,53 @@ std::vector<RenderObjectConfig> RenderObjectSceneCreator::createExperimentalScen
 
 	// ===== Non Instanced Objects =====
 	// Player
-	RenderObjectConfig playerObjectConfig;
-	playerObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, true };
-	playerObjectConfig.objectLocation = { MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
+	ObjectConfig playerObjectConfig;
+	MathUtils::Vec3 playerOrigin(0.0f, 0.0f, 0.0f);
+	playerObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, true, true };
+	playerObjectConfig.objectLocationOrientation = { playerOrigin, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
 	playerObjectConfig.objectMaterialNames = { 32.0f, "container2_resized.PNG", "container2_specular.PNG" };
+	playerObjectConfig.physicsShapeInfo = { ShapeType::Box, { 1.0f, 0.0f } };
 	renderObjectConfigList.push_back(playerObjectConfig);
 
 
 	// Cube Object
-	RenderObjectConfig cubeObjectConfig;
-	cubeObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false };
-	cubeObjectConfig.objectLocation = { MathUtils::Vec3{-1.0f, -1.0f, -1.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, 0.0f };
+	ObjectConfig cubeObjectConfig;
+	MathUtils::Vec3 cubeOrigin(-1.0f, -1.0f, -2.0f);
+	cubeObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_CUBE, false, true };
+	cubeObjectConfig.objectLocationOrientation = { cubeOrigin, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
 	cubeObjectConfig.objectMaterialNames = { 32.0f, "container2_resized.PNG", "container2_specular.PNG" };
+	cubeObjectConfig.physicsShapeInfo = { ShapeType::Box, { 0.0f, 1.0f } };
 	renderObjectConfigList.push_back(cubeObjectConfig);
 
 	// TODO: Convert these over to instanced rendering
 	// ===== Transparent Objects =====
 	// // Grass
-	RenderObjectConfig grassObjectConfig;
-	grassObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_PLANE, false };
-	grassObjectConfig.objectLocation = { MathUtils::Vec3{ 1.0f, -1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
+	ObjectConfig grassObjectConfig;
+	grassObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_PLANE, false, false };
+	grassObjectConfig.objectLocationOrientation = { MathUtils::Vec3{ 1.0f, -1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
 	grassObjectConfig.objectMaterialNames = { 32.0f, "grass.png", "grass.png" };
 	renderObjectConfigList.push_back(grassObjectConfig);
 
 	// Window
-	RenderObjectConfig windowObjectConfig;
-	windowObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_PLANE, false };
-	windowObjectConfig.objectLocation = { MathUtils::Vec3{ 0.0f, -1.0f, 0.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
+	ObjectConfig windowObjectConfig;
+	windowObjectConfig.renderObjectProperties = { GeometryTypes::NONINSTANCED_PLANE, false, false };
+	windowObjectConfig.objectLocationOrientation = { MathUtils::Vec3{ 0.0f, -1.0f, -2.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, MathUtils::Vec3{ 1.0f, 1.0f, 1.0f }, 0.0f };
 	windowObjectConfig.objectMaterialNames = { 32.0f, "blending_transparent_window_resized.png", "blending_transparent_window_resized.png" };
 	renderObjectConfigList.push_back(windowObjectConfig);
 
 
 	// ===== Light Objects =====
 	// Directional Light
-	RenderObjectConfig directionalLightConfig;
-	directionalLightConfig.renderObjectProperties = { GeometryTypes::DIRECTIONAL_LIGHT, false };
+	ObjectConfig directionalLightConfig;
+	directionalLightConfig.renderObjectProperties = { GeometryTypes::DIRECTIONAL_LIGHT, false, false };
 	directionalLightConfig.lightProperties = { MathUtils::Vec3{ 0.0f, -1.0f, 0.0f }, MathUtils::Vec3{ 0.0f, -1.0f, 0.0f } };
 	directionalLightConfig.phongLightProperties = { { 0.05f, 0.05f, 0.05f }, { 0.4f, 0.4f, 0.4f }, { 0.5f, 0.5f, 0.5f } };
 	renderObjectConfigList.push_back(directionalLightConfig);
 
 
 	// Spot Light
-	RenderObjectConfig spotLightConfig;
-	spotLightConfig.renderObjectProperties = { GeometryTypes::INSTANCED_SPOT_LIGHT, false };
+	ObjectConfig spotLightConfig;
+	spotLightConfig.renderObjectProperties = { GeometryTypes::INSTANCED_SPOT_LIGHT, false, false };
 	spotLightConfig.lightProperties = { MathUtils::Vec3{ 0.0f, 0.0f, 0.0f }, MathUtils::Vec3{ 0.0f, 0.0f, 0.0f } };
 	spotLightConfig.phongLightProperties = { {0.0f, 0.0f, 0.0f}, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } };
 	spotLightConfig.attenuationParams = { 1.0f, 0.09f, 0.032f };
@@ -88,14 +103,15 @@ std::vector<RenderObjectConfig> RenderObjectSceneCreator::createExperimentalScen
 
 
 	// Point Light
-	RenderObjectConfig pointLightObjectConfig;
-	pointLightObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_POINT_LIGHT, false };
+	ObjectConfig pointLightObjectConfig;
+	pointLightObjectConfig.renderObjectProperties = { GeometryTypes::INSTANCED_POINT_LIGHT, false, true };
 	pointLightObjectConfig.objectMaterialNames = { 32.0f, "Instanced_Texture_Array", "container2_specular.PNG" };
+	pointLightObjectConfig.physicsShapeInfo = { ShapeType::Box, { 0.0f, 1.0f } };
 	pointLightObjectConfig.phongLightProperties = { {0.5f, 0.5f, 0.5f}, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f } };
 	pointLightObjectConfig.attenuationParams = { 1.0f, 0.09f, 0.032f };
 
 	// Add instanced cube model matrix attribs
-	ObjectProperties tmpObjProps{ MathUtils::Vec3{0.0f, 0.0f, 0.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, 0.0f };
+	ObjectProperties tmpObjProps{ MathUtils::Vec3{1.0f, 1.0f, -2.0f}, MathUtils::Vec3{1.0f, 1.0f, 1.0f}, 0.0f };
 
 	Transform transform{};
 	transform.resetMatrix(MatrixTransform::MatrixTypes::MODEL);
@@ -109,14 +125,14 @@ std::vector<RenderObjectConfig> RenderObjectSceneCreator::createExperimentalScen
 	renderObjectConfigList.push_back(pointLightObjectConfig);
 
 	// ===== Text Object =====
-	RenderObjectConfig textConfig;
-	textConfig.renderObjectProperties = { GeometryTypes::TEXT, false };
+	ObjectConfig textConfig;
+	textConfig.renderObjectProperties = { GeometryTypes::TEXT, false, false };
 	textConfig.textProperties = { "Sample Text", {50.0f, 50.0f}, 2.0f, {1.0f, 1.0f, 1.0f} };
 	renderObjectConfigList.push_back(textConfig);
 
 	// ===== Skybox Object =====
-	RenderObjectConfig skyboxConfig;
-	skyboxConfig.renderObjectProperties = { GeometryTypes::SKYBOX, false };
+	ObjectConfig skyboxConfig;
+	skyboxConfig.renderObjectProperties = { GeometryTypes::SKYBOX, false, false };
 	renderObjectConfigList.push_back(skyboxConfig);
 
 	LOG(INFO) << "Experimental scene created";

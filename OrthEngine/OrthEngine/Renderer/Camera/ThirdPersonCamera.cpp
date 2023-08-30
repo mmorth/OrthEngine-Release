@@ -23,6 +23,14 @@ std::array<float, MathUtils::MAT4_SIZE> ThirdPersonCamera::GetViewMatrix()
 }
 
 // ------------------------------------------------------------------------
+void ThirdPersonCamera::SetTarget(MathUtils::Vec3 newCameraTarget)
+{
+    m_cameraAttributes.target = glm::vec3(newCameraTarget.x, newCameraTarget.y, newCameraTarget.z);
+
+    m_cameraAttributes.position = m_cameraAttributes.target - m_cameraAttributes.front * CAM_PLAYER_DISTANCE;
+}
+
+// ------------------------------------------------------------------------
 void ThirdPersonCamera::ProcessKeyboard(const CameraMovement& direction, const float deltaTime)
 {
     float velocity = m_cameraOptions.movementSpeed * deltaTime;

@@ -5,12 +5,13 @@
 #include <g3log/loglevels.hpp>
 #include <g3log/logworker.hpp>
 
-#include "GlobalSettingsConstants/GlobalSettings.hpp"
 #include "Factories/FramebufferFactory.hpp"
-#include "Rasterizers/RasterizerUtility.hpp"
 #include "Factories/RenderObjectFactory.hpp"
-#include "RenderObjectSceneCreator.hpp"
 #include "Factories/ShaderFactory.hpp"
+#include "GlobalSettingsConstants/GlobalSettings.hpp"
+#include "Rasterizers/RasterizerUtility.hpp"
+#include "RenderObjectSceneCreator.hpp"
+
 #include "Window/Window.hpp"
 
 struct RenderOptions 
@@ -30,12 +31,11 @@ public:
     virtual void initialize(const std::shared_ptr<FramebufferFactory> framebufferFactory = nullptr, const std::shared_ptr<RenderObjectFactory> renderObjectFactory = nullptr, const std::shared_ptr<ShaderFactory> shaderFactory = nullptr, const std::shared_ptr<RenderObjectSceneCreator> renderObjectSceneCreator = nullptr);
 
     // RenderObject creation functions
-    virtual void loadScene(const std::vector<RenderObjectConfig>& renderObjectConfigs);
-    virtual void createRenderObject(const RenderObjectConfig& renderObjectConfig);
+    virtual RenderObject* createRenderObject(const unsigned int curID, const ObjectConfig& renderObjectConfig);
 
     // RenderObject update functions
     virtual void updateFpsText(const std::string& newFpsString);
-    virtual bool updateRenderObject(const RenderObjectProperties& renderObjectProperties, const RenderObjectConfig& renderObjectConfig);
+    virtual bool updateRenderObject(const RenderObjectProperties& renderObjectProperties, const ObjectConfig& renderObjectConfig);
     virtual void removeObjectWithID(const unsigned int objectID);
 
     virtual void createInstancedObject(RenderObject* renderObjectPtr, const std::array<float, MathUtils::MAT4_SIZE>& modelMatrix, float textureID);
@@ -63,12 +63,11 @@ protected:
     std::unique_ptr<Framebuffer> m_framebuffer;
     std::unique_ptr<SkyboxObject> m_skyboxObject;
     std::unordered_map<int, std::unique_ptr<RenderObject>> m_renderObjects;
-    std::unordered_set<unsigned int> m_playerIDs;    
+    std::vector<unsigned int> m_playerIDs;    
     
     unsigned int m_fpsTextID;
-    unsigned int m_curID;
 
-    static constexpr unsigned int RESERVED_IDS = 1;
+    static constexpr unsigned int RESERVED_IDS = 2;
 
 private:
     std::vector<unsigned char> m_testFramebufferContents;

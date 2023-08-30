@@ -6,6 +6,7 @@
 #include "Factories/CameraFactory.hpp"
 #include "Factories/FramebufferFactory.hpp"
 #include "Factories/RenderObjectFactory.hpp"
+#include "Factories/RigidBodyFactory.hpp"
 #include "Factories/ShaderFactory.hpp"
 #include "Factories/VertexDataFactory.hpp"
 
@@ -32,7 +33,7 @@ public:
 class FramebufferFactoryMock : public FramebufferFactory 
 {
 public:
-    MOCK_METHOD(void, initialize, (std::shared_ptr<ShaderFactory> shaderFactory, std::shared_ptr<VertexDataFactory> vertexDataFactory), (override));
+    //MOCK_METHOD(void, initialize, (std::shared_ptr<ShaderFactory> shaderFactory, std::shared_ptr<VertexDataFactory> vertexDataFactory), (override));
     MOCK_METHOD(std::unique_ptr<Framebuffer>, getFramebuffer, (), (override));
 };
 
@@ -45,8 +46,14 @@ public:
 class RenderObjectFactoryMock : public RenderObjectFactory 
 {
 public:
-    MOCK_METHOD(std::optional<std::unique_ptr<RenderObject>>, createRenderObject, (const RenderObjectConfig& renderObjectConfig), (override));
+    MOCK_METHOD(std::optional<std::unique_ptr<RenderObject>>, createRenderObject, (const ObjectConfig& renderObjectConfig), (override));
     MOCK_METHOD(void, initialize, (std::shared_ptr<ShaderFactory> shaderFactory, std::shared_ptr<RasterizerFactory> rasterizerFactory, std::shared_ptr<TextureFactory> textureFactory), (override));
+};
+
+class RigidBodyFactoryMock : public RigidBodyFactory 
+{
+public:
+    MOCK_METHOD(std::optional<std::unique_ptr<RigidBody>>, createRigidBody, (const ObjectConfig& objectConfig), (override));
 };
 
 #endif // FACTORYMOCK_HPP

@@ -7,7 +7,7 @@
 class GeometricNonInstancedObject : public NonInstancedObject 
 {
 public:
-    GeometricNonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties);
+    GeometricNonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocationOrientation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties);
     ~GeometricNonInstancedObject();
 
     virtual void render(const std::array<float, MathUtils::MAT4_SIZE>& projectionMatrix, const std::array<float, MathUtils::MAT4_SIZE>& viewMatrix) override;

@@ -29,5 +29,3 @@ add_subdirectory(Shader)
 add_subdirectory(Texture)
 add_subdirectory(Transform)
 add_subdirectory(Window)
-
-#add_subdirectory(tests)

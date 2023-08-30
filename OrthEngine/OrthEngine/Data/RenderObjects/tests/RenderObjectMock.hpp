@@ -15,7 +15,7 @@ public:
 class NonInstancedObjectMock : public NonInstancedObject 
 {
 public:
-    NonInstancedObjectMock(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocation objectLocation)
+    NonInstancedObjectMock(std::shared_ptr<Shader> shaderPtr, std::shared_ptr<NonInstancedRasterizer> rasterizer, ObjectLocationOrientation objectLocation)
         : NonInstancedObject(shaderPtr, rasterizer, objectLocation) {}
 
     MOCK_METHOD(void, render, ((const std::array<float, MathUtils::MAT4_SIZE>& projectionMatrix), (const std::array<float, MathUtils::MAT4_SIZE>& viewMatrix)), (override));
@@ -47,7 +47,7 @@ public:
 class GeometricNonInstancedObjectMock : public GeometricNonInstancedObject 
 {
 public:
-    GeometricNonInstancedObjectMock(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties)
+    GeometricNonInstancedObjectMock(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizer, const ObjectLocationOrientation& objectLocation, const ObjectMaterialProperties& objectMaterialProperties)
         : GeometricNonInstancedObject(shaderPtr, rasterizer, objectLocation, objectMaterialProperties) {}
 
     MOCK_METHOD(void, render, ((const std::array<float, MathUtils::MAT4_SIZE>& projectionMatrix), (const std::array<float, MathUtils::MAT4_SIZE>& viewMatrix)), (override));

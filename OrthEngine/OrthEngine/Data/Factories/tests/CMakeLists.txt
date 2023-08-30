@@ -27,6 +27,7 @@ target_link_libraries(FactoryTest
   ShaderMock
   RasterizerMock
   RenderObjectMock
+  RigidBody
   Texture
   TextureFactoryMock
 )

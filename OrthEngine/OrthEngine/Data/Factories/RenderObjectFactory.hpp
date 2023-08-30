@@ -47,7 +47,7 @@ struct SetupTeardownSettings
 struct RenderLoopConfigOptions 
 {
     LightProperties lightProperties;
-    ObjectLocation objectLocation;
+    ObjectLocationOrientation objectLocation;
     SetupTeardownSettings setupTeardownSettings;
 };
 
@@ -57,7 +57,7 @@ public:
     static RenderObjectFactory& getInstance();
 
     // object creation functions
-    virtual std::optional<std::unique_ptr<RenderObject>> createRenderObject(const RenderObjectConfig& renderObjectConfig);
+    virtual std::optional<std::unique_ptr<RenderObject>> createRenderObject(const ObjectConfig& renderObjectConfig);
     virtual void initialize(const std::shared_ptr<ShaderFactory> shaderFactory, const std::shared_ptr<RasterizerFactory> rasterizerFactory, const std::shared_ptr<TextureFactory> textureFactory);
 
 protected:

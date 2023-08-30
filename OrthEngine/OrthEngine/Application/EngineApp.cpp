@@ -22,15 +22,18 @@ EngineApp::EngineApp(const bool isTestRender)
 		)
 	)
 	, m_renderObjectManager(std::make_shared<RenderObjectManager>())
-	, m_camera(CameraFactory::getInstance().getCamera(CameraTypes::FIRST_PERSON, MathUtils::Vec3{ 0.0f, 1.0f, 3.0f }))
+	, m_physicsManager(std::make_shared<PhysicsManager>())
+	, m_camera(CameraFactory::getInstance().getCamera(CameraTypes::THIRD_PERSON, MathUtils::Vec3{ 0.0f, 1.0f, 3.0f }))
 	, m_deltaTime(0.0f)
 	, m_lastFrame(0.0f)
 	, m_isTestRender(isTestRender)
+	, m_renderObjectSceneCreator(std::make_shared<RenderObjectSceneCreator>())
+	, m_curID(RESERVED_IDS+1)
 {
 	LOG(INFO) << "ctor";
 
-	// Initialize RenderObjectManager
-	m_renderObjectManager->initialize();
+	// Initialize scene objects and collisions
+	loadScene(m_renderObjectSceneCreator->createExperimentalScene());
 
 	// Subscribe to Window events from Window
 	m_window->s_cursorPosPublisher->subscribe(this, [this](std::pair<double, double> pos)
@@ -64,13 +67,31 @@ EngineApp::EngineApp(const bool isTestRender)
 EngineApp::~EngineApp() {}
 
 // ------------------------------------------------------------------------
-void EngineApp::initialize(const std::shared_ptr<Window> window, const std::shared_ptr<RenderObjectManager> renderObjectManager, const std::shared_ptr<Camera> camera)
+void EngineApp::initialize(const std::shared_ptr<Window> window, const std::shared_ptr<RenderObjectManager> renderObjectManager, const std::shared_ptr<PhysicsManager> physicsManager, const std::shared_ptr<Camera> camera, const std::shared_ptr<RenderObjectSceneCreator> renderObjectSceneCreator)
 {
 	m_window = window;
 	m_renderObjectManager = renderObjectManager;
+	m_physicsManager = physicsManager;
 	m_camera = camera;
+	m_renderObjectSceneCreator = renderObjectSceneCreator;
 
 	LOG(INFO) << "EngineApp mocks set";
+}
+
+// ------------------------------------------------------------------------
+void EngineApp::loadScene(const std::vector<ObjectConfig>& renderObjectConfigs)
+{
+	m_renderObjectManager->initialize();
+
+	// Create all the objets specified by the scene
+	for (ObjectConfig renderObjectConfig : renderObjectConfigs)
+	{
+		m_renderObjectManager->createRenderObject(m_curID, renderObjectConfig);
+		
+		if (renderObjectConfig.renderObjectProperties.isCollidable)
+			m_physicsManager->createRigidBody(m_curID, renderObjectConfig, renderObjectConfig.renderObjectProperties.isPlayer);
+		m_curID++;
+	}
 }
 
 // ------------------------------------------------------------------------
@@ -99,9 +120,24 @@ void EngineApp::run()
 		int windowWidth, windowHeight;
 		m_window->getWindowSize(windowWidth, windowHeight);
 
+		// Render objects and process collisions
 		RenderLoopConfigOptions renderLoopConfigOptions = { {m_camera->GetPosition(), m_camera->GetFront()}, {}, 
-			{GlobalSettings::getInstance().getValue<bool>("framebufferEnabled", false), GlobalSettings::getInstance().getValue<bool>("msaaEnabled", false), GlobalSettings::getInstance().getValue<bool>("drawNormals", false), m_isTestRender} };
-		m_renderObjectManager->renderAll(m_renderObjectManager->getTransformationMatrices(m_camera, windowWidth, windowHeight), renderLoopConfigOptions);
+			{GlobalSettings::getInstance().getValue<bool>("framebufferEnabled", false), GlobalSettings::getInstance().getValue<bool>("msaaEnabled", false)
+			, GlobalSettings::getInstance().getValue<bool>("drawNormals", false), m_isTestRender} };
+		m_physicsManager->updatePlayerLocation(m_camera->GetFrontVector(), m_deltaTime);
+
+		// Step simulation and detect bullet collisions and update object positions
+		m_physicsManager->stepSimulationAndCheckCollision(m_deltaTime);
+		MathUtils::Vec3 newPlayerPosition = m_physicsManager->getPlayerLocation();
+		m_camera->SetTarget(newPlayerPosition);
+		// Detect and handle camera collision
+		MathUtils::Vec3 originalPosition = m_camera->GetFrontVector();
+		MathUtils::Vec3 newCamPosition = m_physicsManager->detectCameraCollision(newPlayerPosition, m_camera->GetPosition(), m_camera->GetFront());
+		m_camera->SetPosition(newCamPosition);
+		TransformationMatrices transformationMatrices = m_renderObjectManager->getTransformationMatrices(m_camera, windowWidth, windowHeight);
+		transformationMatrices.camPosition = originalPosition;
+		// Render all objects based on detected collisions
+		m_renderObjectManager->renderAll(transformationMatrices, renderLoopConfigOptions);
 
 		// Swap buffers to prevent flickering or tearing in rasterization and poll user input events
 		m_window->swapBuffers();

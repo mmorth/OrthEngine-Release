@@ -11,6 +11,7 @@
 namespace MathUtils
 {
     constexpr unsigned int MAT4_SIZE = 16; /**< Size of the transformation matrices [4x4] matrix. */
+    constexpr unsigned int MAT3_SIZE = 9; /**< Size of the transformation matrices [3x3] matrix. */
     constexpr unsigned int VEC4_SIZE = 4; /**< Size of a [4x1] vector. */
     constexpr unsigned int VEC3_SIZE = 3; /**< Size of a [3x1] vector. */
     constexpr float EPSILON = 1e-6f; // Adjust the epsilon value based on your tolerance requirement
@@ -47,12 +48,6 @@ namespace MathUtils
         Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
         Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
-        // Length calculation
-        float length() const 
-        {
-            return std::sqrt(x * x + y * y + z * z);
-        }
-
         // Scalar multiplication
         Vec3 operator*(float scalar) const
         {
@@ -63,6 +58,18 @@ namespace MathUtils
         Vec3 operator+(const Vec3& other) const 
         {
             return Vec3{ x + other.x, y + other.y, z + other.z };
+        }
+
+        // Vector subtraction
+        Vec3 operator-(const Vec3& other) const
+        {
+            return Vec3{ x - other.x, y - other.y, z - other.z };
+        }
+
+        // Vector scalar addition
+        Vec3 operator+(float offset) const
+        {
+            return Vec3{ x + offset, y + offset, z + offset };
         }
 
         // Comparison operators
@@ -76,6 +83,23 @@ namespace MathUtils
         bool operator!=(const Vec3& other) const {
             return !(*this == other);
         }
+
+        // Functions
+        float length() const
+        {
+            return std::sqrt(x * x + y * y + z * z);
+        }
+
+        void normalize() 
+        {
+            float length = this->length();
+            if (length > 0) 
+            {
+                x /= length;
+                y /= length;
+                z /= length;
+            }
+        }
     };
 
     /**
@@ -87,6 +111,10 @@ namespace MathUtils
         float y; /**< Y component of the vector */
         float z; /**< Z component of the vector */
         float w; /**< W component of the vector */
+
+        // Constructors
+        Vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
+        Vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
     };
 }
 

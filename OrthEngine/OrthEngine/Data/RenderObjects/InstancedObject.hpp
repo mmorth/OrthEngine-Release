@@ -15,6 +15,7 @@ public:
 
     virtual void addInstancedObject(const std::array<float, MathUtils::MAT4_SIZE>& modelMatrix, const float textureID);
     virtual void removeInstancedObject(const unsigned int index);
+    virtual void updateInstancedObject(const unsigned int index, const MathUtils::Vec3& objectLocation);
 
 protected:
     std::shared_ptr<InstancedRasterizer> m_rasterizer;

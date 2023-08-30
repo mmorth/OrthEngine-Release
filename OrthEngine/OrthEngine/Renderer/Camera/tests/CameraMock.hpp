@@ -27,6 +27,8 @@ public:
     MOCK_METHOD(float, GetZoom, (), (override));
     MOCK_METHOD(MathUtils::Vec3, GetFront, (), (override));
     MOCK_METHOD(MathUtils::Vec3, GetPosition, (), (override));
+    MOCK_METHOD(void, SetPosition, (MathUtils::Vec3 newCameraPosition), (override));
+    MOCK_METHOD(void, SetTarget, (MathUtils::Vec3 newCameraTarget), (override));
 
 protected:
     MOCK_METHOD(void, updateCameraVectors, (), (override));

@@ -27,7 +27,7 @@ void RenderObjectFactory::initialize(const std::shared_ptr<ShaderFactory> shader
 }
 
 // ------------------------------------------------------------------------
-std::optional<std::unique_ptr<RenderObject>> RenderObjectFactory::createRenderObject(const RenderObjectConfig& renderObjectConfig)
+std::optional<std::unique_ptr<RenderObject>> RenderObjectFactory::createRenderObject(const ObjectConfig& renderObjectConfig)
 {
 	std::unique_ptr<RenderObject> renderObjectPtr;
 
@@ -43,14 +43,14 @@ std::optional<std::unique_ptr<RenderObject>> RenderObjectFactory::createRenderOb
 		case GeometryTypes::NONINSTANCED_CUBE:
 		{
 			ObjectMaterialProperties objectMaterialProperties = { renderObjectConfig.objectMaterialNames.shininess, m_textureFactory->getTextureID(renderObjectConfig.objectMaterialNames.diffuseMap).value(), m_textureFactory->getTextureID(renderObjectConfig.objectMaterialNames.specularMap).value() };
-			renderObjectPtr = std::make_unique<GeometricNonInstancedObject>(GeometricNonInstancedObject(m_shaderFactory->getShader("Default_Object").value(), std::static_pointer_cast<NonInstancedRasterizer>(m_rasterizerFactory->getRasterizer(renderObjectConfig.renderObjectProperties.geometryType).value()), renderObjectConfig.objectLocation, objectMaterialProperties));
+			renderObjectPtr = std::make_unique<GeometricNonInstancedObject>(GeometricNonInstancedObject(m_shaderFactory->getShader("Default_Object").value(), std::static_pointer_cast<NonInstancedRasterizer>(m_rasterizerFactory->getRasterizer(renderObjectConfig.renderObjectProperties.geometryType).value()), renderObjectConfig.objectLocationOrientation, objectMaterialProperties));
 			LOG(INFO) << "NonInstanced cube created";
 			break;
 		}
 		case GeometryTypes::NONINSTANCED_PLANE:
 		{
 			ObjectMaterialProperties objectMaterialProperties = { renderObjectConfig.objectMaterialNames.shininess, m_textureFactory->getTextureID(renderObjectConfig.objectMaterialNames.diffuseMap).value(), m_textureFactory->getTextureID(renderObjectConfig.objectMaterialNames.specularMap).value() };
-			renderObjectPtr = std::make_unique<GeometricNonInstancedObject>(GeometricNonInstancedObject(m_shaderFactory->getShader("Default_Object").value(), std::static_pointer_cast<NonInstancedRasterizer>(m_rasterizerFactory->getRasterizer(renderObjectConfig.renderObjectProperties.geometryType).value()), renderObjectConfig.objectLocation, objectMaterialProperties));
+			renderObjectPtr = std::make_unique<GeometricNonInstancedObject>(GeometricNonInstancedObject(m_shaderFactory->getShader("Default_Object").value(), std::static_pointer_cast<NonInstancedRasterizer>(m_rasterizerFactory->getRasterizer(renderObjectConfig.renderObjectProperties.geometryType).value()), renderObjectConfig.objectLocationOrientation, objectMaterialProperties));
 			LOG(INFO) << "NonInstanced plane created";
 			break;
 		}

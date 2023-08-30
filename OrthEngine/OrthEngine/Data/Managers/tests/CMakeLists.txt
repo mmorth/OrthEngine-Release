@@ -25,6 +25,7 @@ target_link_libraries(ManagerTest
   FactoryMock
   Framebuffer
   FramebufferMock
+  PhysicsWorldMock
   Publisher
   ShaderMock
   RasterizerMock
@@ -41,6 +42,7 @@ target_include_directories(ManagerTest PUBLIC
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Camera/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Shader/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Texture/tests"
+    "${CMAKE_SOURCE_DIR}/OrthEngine/Physics/PhysicsWorld/tests"
 )
 
 include(GoogleTest)

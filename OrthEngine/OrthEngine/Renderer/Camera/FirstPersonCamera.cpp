@@ -21,6 +21,12 @@ std::array<float, MathUtils::MAT4_SIZE> FirstPersonCamera::GetViewMatrix()
 }
 
 // ------------------------------------------------------------------------
+void FirstPersonCamera::SetTarget(MathUtils::Vec3 newCameraTarget)
+{
+    m_cameraAttributes.position = m_cameraAttributes.target - m_cameraAttributes.front * CAM_PLAYER_DISTANCE;
+}
+
+// ------------------------------------------------------------------------
 void FirstPersonCamera::ProcessKeyboard(const CameraMovement& direction, const float deltaTime)
 {
     float velocity = m_cameraOptions.movementSpeed * deltaTime;

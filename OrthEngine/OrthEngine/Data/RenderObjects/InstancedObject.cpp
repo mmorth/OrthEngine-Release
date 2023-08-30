@@ -68,6 +68,21 @@ void InstancedObject::removeInstancedObject(const unsigned int index)
 }
 
 // ------------------------------------------------------------------------
+void InstancedObject::updateInstancedObject(const unsigned int index, const MathUtils::Vec3& objectLocation)
+{
+	if (index < m_modelMatrices.size())
+	{
+		// Update object location in modelMatrix
+		std::array<float, MathUtils::MAT4_SIZE> modelMatrix = m_modelMatrices.at(index);
+		modelMatrix.at(12) = objectLocation.x; modelMatrix.at(13) = objectLocation.y; modelMatrix.at(14) = objectLocation.z;
+		m_modelMatrices.at(index) = modelMatrix;
+
+		// Update instance buffers
+		m_rasterizer->updateModelMatrices(m_modelMatrices);
+	}
+}
+
+// ------------------------------------------------------------------------
 void InstancedObject::renderObject(const std::shared_ptr<Shader> shaderPtr, const std::array<float, MathUtils::MAT4_SIZE>& projectionMatrix, const std::array<float, MathUtils::MAT4_SIZE>& viewMatrix)
 {
 	// Draw the instanced object

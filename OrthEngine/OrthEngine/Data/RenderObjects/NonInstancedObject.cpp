@@ -1,7 +1,7 @@
 #include "NonInstancedObject.hpp"
 
 // ------------------------------------------------------------------------
-NonInstancedObject::NonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizerPtr, const ObjectLocation& objectLocation)
+NonInstancedObject::NonInstancedObject(const std::shared_ptr<Shader> shaderPtr, const std::shared_ptr<NonInstancedRasterizer> rasterizerPtr, const ObjectLocationOrientation& objectLocation)
     : RenderObject(shaderPtr)
     , m_rasterizer(rasterizerPtr)
     , m_objectLocation(objectLocation)
@@ -44,13 +44,19 @@ void NonInstancedObject::updateLocation(const MathUtils::Vec3& newPosition)
 }
 
 // ------------------------------------------------------------------------
+ObjectLocationOrientation NonInstancedObject::getObjectLocationOrientation()
+{
+    return m_objectLocation;
+}
+
+// ------------------------------------------------------------------------
 void NonInstancedObject::renderObject(const std::shared_ptr<Shader> shaderPtr, const std::array<float, MathUtils::MAT4_SIZE>& projectionMatrix, const std::array<float, MathUtils::MAT4_SIZE>& viewMatrix)
 {
     // Apply the model matrix transformation
     shaderPtr->use();
     m_transform->resetMatrix(MatrixTransform::MatrixTypes::MODEL);
     m_transform->applyTranslation(MatrixTransform::MatrixTypes::MODEL, m_objectLocation.position);
-    m_transform->applyScale(MatrixTransform::MatrixTypes::MODEL, m_objectLocation.size);
+    m_transform->applyScale(MatrixTransform::MatrixTypes::MODEL, m_objectLocation.scale);
     m_transform->applyRotation(MatrixTransform::MatrixTypes::MODEL, m_objectLocation.orientation, m_objectLocation.position);
     std::array<float, MathUtils::MAT4_SIZE> modelMatrix = m_transform->getTransformationMatrix(MatrixTransform::MatrixTypes::MODEL);
     shaderPtr->setMat4("model", modelMatrix.data());

@@ -6,7 +6,10 @@ add_executable(TestRunner
     ${CMAKE_SOURCE_DIR}/OrthEngine/Application/EventSystem/tests/PublisherTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Data/Factories/tests/FactoryTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Data/GlobalSettingsConstants/tests/GlobalSettingsTests.cpp
+    ${CMAKE_SOURCE_DIR}/OrthEngine/Data/Managers/tests/ManagerTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Data/RenderObjects/tests/RenderObjectTests.cpp
+    ${CMAKE_SOURCE_DIR}/OrthEngine/Physics/PhysicsWorld/tests/PhysicsWorldTests.cpp
+    ${CMAKE_SOURCE_DIR}/OrthEngine/Physics/RigidBody/tests/RigidBodyTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Camera/tests/CameraTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Framebuffer/tests/FramebufferTests.cpp
     ${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Rasterizers/tests/RasterizerTests.cpp
@@ -31,11 +34,13 @@ target_link_libraries(TestRunner
     Managers
     ManagerMock
     OpenGLFixture
+    PhysicsWorldMock
     Publisher
     PublisherMock
     Rasterizer
     RenderObjects
     RenderObjectMock
+    RigidBody
     Shader
     Texture
     TextureFactoryMock
@@ -50,6 +55,7 @@ target_include_directories(TestRunner PUBLIC
     "${CMAKE_SOURCE_DIR}/OrthEngine/Data/Factories/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Data/Managers/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Data/RenderObjects/tests"
+    "${CMAKE_SOURCE_DIR}/OrthEngine/Physics/PhysicsWorld/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Camera/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/Texture/tests"
     "${CMAKE_SOURCE_DIR}/OrthEngine/Renderer/tests"

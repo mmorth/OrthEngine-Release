@@ -9,24 +9,18 @@
 
 #include "RenderObjects/LightObjects/LightObjectStructs.hpp"
 #include "RenderObjects/OtherRenders/OtherRenderStructs.hpp"
-#include "RenderObjects/RenderObjectStructs.hpp"
+#include "ObjectStructs.hpp"
 
-// ===== Misc. structs =====
+// ===== ObjectConfig Structs =====
 
 struct TransformationMatrices 
 {
     std::array<float, MathUtils::MAT4_SIZE> projectionMatrix;
     std::array<float, MathUtils::MAT4_SIZE> viewMatrix;
     MathUtils::Vec3 camPosition;
-
-    // TODO: Determine how to create constructor without breaking initializer list implementations
-    //// Constructor
-    //TransformationMatrices()
-    //    : projectionMatrix{} , viewMatrix{}, camPosition(0.0f, 0.0f, 0.0f)
-    //{}
 };
 
-// ===== RenderObjectConfig defs =====
+// ===== ObjectConfig defs =====
 
 enum class GeometryTypes 
 {
@@ -46,7 +40,7 @@ struct RenderObjectProperties
 {
     GeometryTypes geometryType;
     bool isPlayer;
-    bool isFpsText;
+    bool isCollidable;
 };
 
 struct ObjectProperties 
@@ -72,11 +66,11 @@ struct InstancedObjectProperties
     std::vector<std::string> textureArrayNames;
 };
 
-struct RenderObjectConfig 
+struct ObjectConfig 
 {
     // RenderObject Properties
     RenderObjectProperties renderObjectProperties;
-    ObjectLocation objectLocation;
+    ObjectLocationOrientation objectLocationOrientation;
     ObjectMaterialNames objectMaterialNames;
     InstancedObjectProperties instancedObjectProperties;
 
@@ -88,6 +82,7 @@ struct RenderObjectConfig
 
     // Other Properties
     TextProperties textProperties;
+    PhysicsShapeInfo physicsShapeInfo;
 };
 
 #endif // FACTORYSTRUCTS_HPP

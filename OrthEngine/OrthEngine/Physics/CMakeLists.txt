@@ -1,0 +1,3 @@
+add_subdirectory(PhysicsWorld)
+add_subdirectory(RigidBody)
+add_subdirectory(PhysicsUtils)

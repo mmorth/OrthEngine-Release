@@ -14,6 +14,7 @@ target_link_libraries(RenderObjectTest
   GTest::gtest_main
   GTest::gmock
   GTest::gmock_main
+  ObjectUtils
   OpenGLFixture
   ShaderMock
   TransformMock

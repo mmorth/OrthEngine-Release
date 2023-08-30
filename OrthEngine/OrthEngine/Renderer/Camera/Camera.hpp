@@ -102,6 +102,9 @@ public:
     virtual float GetZoom() { return m_cameraOptions.zoom; }
     virtual MathUtils::Vec3 GetFront() { return { m_cameraAttributes.front.x, m_cameraAttributes.front.y, m_cameraAttributes.front.z }; }
     virtual MathUtils::Vec3 GetPosition() { return { m_cameraAttributes.position.x, m_cameraAttributes.position.y, m_cameraAttributes.position.z }; }
+    virtual MathUtils::Vec3 GetTarget() { return { m_cameraAttributes.target.x, m_cameraAttributes.target.y, m_cameraAttributes.target.z }; }
+    virtual void Camera::SetPosition(MathUtils::Vec3 newCameraPosition) { m_cameraAttributes.position = glm::vec3(newCameraPosition.x, newCameraPosition.y, newCameraPosition.z); }
+    virtual void Camera::SetTarget(MathUtils::Vec3 newCameraTarget) { m_cameraAttributes.target = glm::vec3(newCameraTarget.x, newCameraTarget.y, newCameraTarget.z); }
 
 protected:
     virtual void updateCameraVectors();
